@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logo.png';
 
 const Navbar = ({
   showSaveButton,
@@ -33,7 +32,7 @@ const Navbar = ({
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <Link to="/">
-            <img src={logo} alt="Logo" className="h-16" />
+            <img src={`${process.env.REACT_APP_API_BASE_URL}/static/media/logo.png`} alt="Logo" className="h-16" />
           </Link>
           <Link to="/">
             <span className="text-white text-2xl font-semibold font-sans">Tintify</span>
