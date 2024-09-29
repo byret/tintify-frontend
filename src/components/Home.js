@@ -14,10 +14,9 @@ const Home = () => {
   const [likedPalettes, setLikedPalettes] = useState([]);
   const [likesModalOpen, setLikesModalOpen] = useState(false);
   const [likesUsers, setLikesUsers] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+  const ${API_BASE_URL} = process.env.REACT_APP_${API_BASE_URL} || 'http://localhost:8080';
 
   const modalRef = useRef(null);
 
@@ -30,27 +29,26 @@ const Home = () => {
       setUsername(savedUsername);
     }
 
-    axios.get('API_BASE_URL/palettes/public')
+    axios.get('${API_BASE_URL}/palettes/public')
       .then(response => setPublicPalettes(response.data))
       .catch(error => console.error('Error fetching public palettes:', error));
 
     if (savedUsername) {
-      axios.get(`API_BASE_URL/palettes/user/${savedUsername}/likes`, { withCredentials: true })
+      axios.get(`${API_BASE_URL}/palettes/user/${savedUsername}/likes`, { withCredentials: true })
         .then(response => setLikedPalettes(response.data))
         .catch(error => console.error('Error fetching liked palettes:', error));
     }
 
-    axios.get('API_BASE_URL/arts/public')
+    axios.get('${API_BASE_URL}/arts/public')
       .then(response => setPublicArts(response.data))
       .catch(error => console.error('Error fetching public arts:', error));
   }, []);
 
   const handleShowLikes = (itemId, type) => {
     const endpoint = type === 'palette' ? `palettes/${itemId}/likes/users` : `arts/${itemId}/likes/users`;
-    axios.get(`API_BASE_URL/${endpoint}`)
+    axios.get(`${API_BASE_URL}/${endpoint}`)
       .then(response => {
         setLikesUsers(response.data);
-        setSelectedItem(itemId);
         setLikesModalOpen(true);
       })
       .catch(error => console.error('Error fetching users who liked the item:', error));
@@ -75,7 +73,7 @@ const Home = () => {
 
     const alreadyLiked = likedPalettes.some(palette => palette.id === paletteId);
 
-    axios.post(`API_BASE_URL/palettes/${paletteId}/like`, {}, { withCredentials: true })
+    axios.post(`${API_BASE_URL}/palettes/${paletteId}/like`, {}, { withCredentials: true })
       .then(() => {
         if (alreadyLiked) {
           setPublicPalettes(publicPalettes.map(palette =>
@@ -295,7 +293,7 @@ const Home = () => {
                   <div key={index} className="flex items-center space-x-2">
                     {user.avatarPath && (
                       <img
-                        src={`API_BASE_URL${user.avatarPath}`}
+                        src={`${API_BASE_URL}${user.avatarPath}`}
                         alt={`${user.username}'s avatar`}
                         className="w-10 h-10 rounded-full"
                         onError={(e) => {

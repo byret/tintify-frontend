@@ -16,7 +16,6 @@ const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('palettes');
   const [likesModalOpen, setLikesModalOpen] = useState(false);
   const [likesUsers, setLikesUsers] = useState([]);
-  const [selectedPalette, setSelectedPalette] = useState(null);
 
   const modalRef = useRef(null);
 
@@ -55,7 +54,6 @@ const UserProfile = () => {
     axios.get(`http://localhost:8080/palettes/${paletteId}/likes/users`)
       .then(response => {
         setLikesUsers(response.data);
-        setSelectedPalette(paletteId);
         setLikesModalOpen(true);
       })
       .catch(error => console.error('Error fetching users who liked the palette:', error));

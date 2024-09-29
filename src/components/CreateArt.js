@@ -217,24 +217,6 @@ const CreateArt = () => {
     setIsSaveModalOpen(true);
   };
 
-  const handleSaveArtAsDraft = () => {
-    const artData = {
-      name: artName,
-      isPublic,
-      pixels,
-      width,
-      height,
-    };
-
-    axios
-      .post(`http://localhost:8080/arts/create`, artData, { withCredentials: true })
-      .then((response) => {
-        console.log('Art saved successfully', response.data);
-        setIsSaveModalOpen(false);
-      })
-      .catch((error) => console.error('Error saving art:', error));
-  };
-
   const handleSaveArtAsFinal = () => {
     const artData = {
       name: artName,
