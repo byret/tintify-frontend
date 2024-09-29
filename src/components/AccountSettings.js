@@ -112,7 +112,7 @@ const AccountSettings = () => {
 
         {avatar && (
           <div className="flex justify-center mb-4">
-            <img src={avatar} alt={`${process.env.PUBLIC_URL}/static/default_avatar.png`} className="rounded-full h-32 w-32 object-cover" />
+            <img src={avatar} alt={`${process.env.PUBLIC_URL}/default_avatar.png`} className="rounded-full h-32 w-32 object-cover" />
           </div>
         )}
 
