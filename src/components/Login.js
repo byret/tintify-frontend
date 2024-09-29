@@ -22,12 +22,18 @@ const handleLogin = async (e) => {
       }
     });
 
-    const { username: loggedInUser } = response.data;
+    const { message, redirectUrl } = response.data;
 
-    if (loggedInUser) {
+    if (message === 'Login successful') {
       sessionStorage.setItem('authToken', 'true');
-      sessionStorage.setItem('username', loggedInUser);
-      window.location.href = '/#/home';
+      sessionStorage.setItem('username', username);  // Сохраняем введённый username
+
+      // Перенаправление на указанный URL
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        window.location.href = '/#/home';
+      }
     } else {
       setMessage('Login failed');
     }
