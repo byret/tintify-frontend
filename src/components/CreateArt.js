@@ -33,6 +33,7 @@ const CreateArt = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isCheckboxDisabled, setIsCheckboxDisabled] = useState(false);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
   const pickerRef = useRef(null);
   const modalRef = useRef(null);
@@ -178,7 +179,7 @@ const CreateArt = () => {
     const username = sessionStorage.getItem('username');
 
     axios
-      .get(`http://localhost:8080/palettes/user/${username}`, { withCredentials: true })
+      .get(`${API_BASE_URL}/palettes/user/${username}`, { withCredentials: true })
       .then((response) => {
         setUserPalettes(response.data);
         setIsModalOpen(true);
@@ -186,14 +187,14 @@ const CreateArt = () => {
       .catch((error) => console.error('Error fetching user palettes:', error));
 
     axios
-      .get(`http://localhost:8080/palettes/user/${username}/likes`, { withCredentials: true })
+      .get(`${API_BASE_URL}/palettes/user/${username}/likes`, { withCredentials: true })
       .then((response) => {
         setLikedPalettes(response.data);
       })
       .catch((error) => console.error('Error fetching liked palettes:', error));
 
     axios
-      .get('http://localhost:8080/palettes/public')
+      .get(`${API_BASE_URL}/palettes/public`)
       .then((response) => {
         setAllPalettes(response.data);
       })
@@ -227,7 +228,7 @@ const CreateArt = () => {
     };
 
     axios
-      .post(`http://localhost:8080/arts/create`, artData, { withCredentials: true })
+      .post(`${API_BASE_URL}/arts/create`, artData, { withCredentials: true })
       .then((response) => {
         setIsSaveModalOpen(false);
       })

@@ -12,6 +12,7 @@ const AccountSettings = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [message, setMessage] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
   useEffect(() => {
     const savedUsername = sessionStorage.getItem('username');
@@ -19,12 +20,12 @@ const AccountSettings = () => {
       setUsername(savedUsername);
       setNewUsername(savedUsername);
 
-      axios.get(`http://localhost:8080/users/edit/${savedUsername}`, {
+      axios.get(`${API_BASE_URL}/users/edit/${savedUsername}`, {
         withCredentials: true,
       })
         .then(response => {
           if (response.data.avatarPath) {
-            const avatarUrl = `http://localhost:8080${response.data.avatarPath}`;
+            const avatarUrl = `${API_BASE_URL}${response.data.avatarPath}`;
             setAvatar(avatarUrl);
           }
         })
@@ -75,7 +76,7 @@ const AccountSettings = () => {
 
     try {
       const token = sessionStorage.getItem('authToken');
-      const response = await axios.put('http://localhost:8080/users/update-user-details', formData, {
+      const response = await axios.put(`${API_BASE_URL}/users/update-user-details`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -88,7 +89,7 @@ const AccountSettings = () => {
         setMessage('User details updated successfully');
         const updatedAvatar = response.data.avatarPath;
         if (updatedAvatar) {
-          const avatarUrl = `http://localhost:8080${updatedAvatar}?t=${new Date().getTime()}`;
+          const avatarUrl = `${API_BASE_URL}${updatedAvatar}?t=${new Date().getTime()}`;
           setAvatar(avatarUrl);
         }
       } else {

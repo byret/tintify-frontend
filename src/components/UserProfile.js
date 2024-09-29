@@ -16,6 +16,7 @@ const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('palettes');
   const [likesModalOpen, setLikesModalOpen] = useState(false);
   const [likesUsers, setLikesUsers] = useState([]);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
   const modalRef = useRef(null);
 
@@ -23,24 +24,24 @@ const UserProfile = () => {
     const loggedInUser = sessionStorage.getItem('username');
     setCurrentUser(loggedInUser || '');
 
-    axios.get(`http://localhost:8080/users/${username}`)
+    axios.get(`${API_BASE_URL}/users/${username}`)
       .then(response => {
         setUser(response.data);
-        setAvatar(`http://localhost:8080${response.data.avatarPath}`);
+        setAvatar(`${API_BASE_URL}${response.data.avatarPath}`);
       })
       .catch(error => console.error('Error fetching user data:', error));
 
-    axios.get(`http://localhost:8080/palettes/user/${username}/public`)
+    axios.get(`${API_BASE_URL}/palettes/user/${username}/public`)
       .then(response => setPalettes(response.data))
       .catch(error => console.error('Error fetching public palettes:', error));
 
     if (loggedInUser) {
-      axios.get(`http://localhost:8080/palettes/user/${loggedInUser}/likes`, { withCredentials: true })
+      axios.get(`${API_BASE_URL}/palettes/user/${loggedInUser}/likes`, { withCredentials: true })
         .then(response => setLikedPalettes(response.data))
         .catch(error => console.error('Error fetching liked palettes:', error));
     }
 
-    axios.get(`http://localhost:8080/arts/user/${username}/public`)
+    axios.get(`${API_BASE_URL}/arts/user/${username}/public`)
       .then(response => setArts(response.data))
       .catch(error => console.error('Error fetching public arts:', error));
   }, [username]);
@@ -51,7 +52,7 @@ const UserProfile = () => {
   };
 
   const handleShowLikes = (paletteId) => {
-    axios.get(`http://localhost:8080/palettes/${paletteId}/likes/users`)
+    axios.get(`${API_BASE_URL}/palettes/${paletteId}/likes/users`)
       .then(response => {
         setLikesUsers(response.data);
         setLikesModalOpen(true);
@@ -74,7 +75,7 @@ const UserProfile = () => {
   const handleLike = (paletteId) => {
     const alreadyLiked = isPaletteLiked(paletteId);
 
-    axios.post(`http://localhost:8080/palettes/${paletteId}/like`, {}, {
+    axios.post(`${API_BASE_URL}/palettes/${paletteId}/like`, {}, {
       withCredentials: true
     })
     .then(() => {
@@ -98,7 +99,7 @@ const UserProfile = () => {
     <div className="min-h-screen bg-primary pt-16">
       <Navbar />
       <div className="container mx-auto py-8 text-center">
-        {avatar && avatar !== "http://localhost:8080" && (
+        {avatar && avatar !== "${API_BASE_URL}" && (
           <img src={avatar} className="rounded-full h-32 w-32 object-cover mx-auto mb-4" alt="User Avatar" />
         )}
         <h1 className="text-3xl font-bold text-secondary">{user?.username}</h1>
@@ -252,7 +253,7 @@ const UserProfile = () => {
                       <div key={index} className="flex items-center space-x-2">
                         {user.avatarPath && (
                           <img
-                            src={`http://localhost:8080${user.avatarPath}`}
+                            src={`${API_BASE_URL}${user.avatarPath}`}
                             alt={`${user.username}'s avatar`}
                             className="w-10 h-10 rounded-full"
                             onError={(e) => {
