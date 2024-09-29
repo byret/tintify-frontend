@@ -112,7 +112,7 @@ const AccountSettings = () => {
 
         {avatar && (
           <div className="flex justify-center mb-4">
-            <img src={avatar} alt="User Avatar" className="rounded-full h-32 w-32 object-cover" />
+            <img src={avatar} alt={`${process.env.REACT_APP_API_BASE_URL}/static/media/default_avatar.png`} className="rounded-full h-32 w-32 object-cover" />
           </div>
         )}
 
