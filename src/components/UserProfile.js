@@ -99,7 +99,7 @@ const UserProfile = () => {
     <div className="min-h-screen bg-primary pt-16">
       <Navbar />
       <div className="container mx-auto py-8 text-center">
-        {avatar && avatar !== "${API_BASE_URL}" && (
+        {avatar && avatar !== `${API_BASE_URL}` && (
           <img src={avatar} className="rounded-full h-32 w-32 object-cover mx-auto mb-4" alt="User Avatar" />
         )}
         <h1 className="text-3xl font-bold text-secondary">{user?.username}</h1>
