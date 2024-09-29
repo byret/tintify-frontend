@@ -1,0 +1,1 @@
+Content-Security-Policy: default-src 'self' https://tintify-f9e20431ea39.herokuapp.com https://your-netlify-domain.netlify.app; script-src 'self' https://tintify-f9e20431ea39.herokuapp.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://tintify-f9e20431ea39.herokuapp.com https://your-netlify-domain.netlify.app; frame-ancestors 'self';
