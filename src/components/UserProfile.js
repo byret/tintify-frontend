@@ -101,7 +101,7 @@ const UserProfile = () => {
       <div className="container mx-auto py-8 text-center">
         {avatar && avatar !== `${API_BASE_URL}` && (
           <img
-            src={avatar ? avatar : "/default_avatar.png"}
+            src={avatar ? avatar : `${process.env.PUBLIC_URL}/default_avatar.png`}
             alt="User Avatar"
             className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
           />
@@ -257,7 +257,7 @@ const UserProfile = () => {
                       <div key={index} className="flex items-center space-x-2">
                         {user.avatarPath && (
                           <img
-                            src={avatar ? avatar : "/default_avatar.png"}  // Если avatar не найден, загружаем default_avatar.png
+                            src={avatar ? avatar : `${process.env.PUBLIC_URL}/default_avatar.png`}
                             alt="User Avatar"
                             className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
                           />
