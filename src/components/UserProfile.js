@@ -44,7 +44,7 @@ const UserProfile = () => {
     axios.get(`${API_BASE_URL}/arts/user/${username}/public`)
       .then(response => setArts(response.data))
       .catch(error => console.error('Error fetching public arts:', error));
-  }, [username]);
+  }, [username, API_BASE_URL]);
 
   // Проверка, лайкнута ли палитра текущим пользователем
   const isPaletteLiked = (paletteId) => {

@@ -31,7 +31,7 @@ const AccountSettings = () => {
         })
         .catch(error => console.error('Error fetching user details:', error));
     }
-  }, []);
+  }, [API_BASE_URL]);
 
   const handleAvatarChange = (e) => {
     setNewAvatar(e.target.files[0]);
