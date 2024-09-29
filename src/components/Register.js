@@ -15,7 +15,7 @@ const Register = () => {
       const response = await axios.post(`${API_BASE_URL}/users/register`, {
         username,
         password,
-      });
+      }, { withCredentials: true });
 
       if (response.status === 200) {
         setMessage('Registration successful! You can now login.');

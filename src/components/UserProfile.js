@@ -24,14 +24,14 @@ const UserProfile = () => {
     const loggedInUser = sessionStorage.getItem('username');
     setCurrentUser(loggedInUser || '');
 
-    axios.get(`${API_BASE_URL}/users/${username}`)
+    axios.get(`${API_BASE_URL}/users/${username}`, { withCredentials: true })
       .then(response => {
         setUser(response.data);
         setAvatar(`${API_BASE_URL}${response.data.avatarPath}`);
       })
       .catch(error => console.error('Error fetching user data:', error));
 
-    axios.get(`${API_BASE_URL}/palettes/user/${username}/public`)
+    axios.get(`${API_BASE_URL}/palettes/user/${username}/public`, { withCredentials: true })
       .then(response => setPalettes(response.data))
       .catch(error => console.error('Error fetching public palettes:', error));
 
@@ -41,7 +41,7 @@ const UserProfile = () => {
         .catch(error => console.error('Error fetching liked palettes:', error));
     }
 
-    axios.get(`${API_BASE_URL}/arts/user/${username}/public`)
+    axios.get(`${API_BASE_URL}/arts/user/${username}/public`, { withCredentials: true })
       .then(response => setArts(response.data))
       .catch(error => console.error('Error fetching public arts:', error));
   }, [username, API_BASE_URL]);
@@ -52,7 +52,7 @@ const UserProfile = () => {
   };
 
   const handleShowLikes = (paletteId) => {
-    axios.get(`${API_BASE_URL}/palettes/${paletteId}/likes/users`)
+    axios.get(`${API_BASE_URL}/palettes/${paletteId}/likes/users`, { withCredentials: true })
       .then(response => {
         setLikesUsers(response.data);
         setLikesModalOpen(true);

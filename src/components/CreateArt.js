@@ -194,7 +194,7 @@ const CreateArt = () => {
       .catch((error) => console.error('Error fetching liked palettes:', error));
 
     axios
-      .get(`${API_BASE_URL}/palettes/public`)
+      .get(`${API_BASE_URL}/palettes/public`, { withCredentials: true })
       .then((response) => {
         setAllPalettes(response.data);
       })

@@ -29,7 +29,7 @@ const Home = () => {
       setUsername(savedUsername);
     }
 
-    axios.get(`${API_BASE_URL}/palettes/public`)
+    axios.get(`${API_BASE_URL}/palettes/public`, { withCredentials: true })
       .then(response => setPublicPalettes(response.data))
       .catch(error => console.error('Error fetching public palettes:', error));
 
@@ -39,14 +39,14 @@ const Home = () => {
         .catch(error => console.error('Error fetching liked palettes:', error));
     }
 
-    axios.get(`${API_BASE_URL}/arts/public`)
+    axios.get(`${API_BASE_URL}/arts/public`, { withCredentials: true })
       .then(response => setPublicArts(response.data))
       .catch(error => console.error('Error fetching public arts:', error));
   }, [API_BASE_URL]);
 
   const handleShowLikes = (itemId, type) => {
     const endpoint = type === 'palette' ? `palettes/${itemId}/likes/users` : `arts/${itemId}/likes/users`;
-    axios.get(`${API_BASE_URL}/${endpoint}`)
+    axios.get(`${API_BASE_URL}/${endpoint}`, { withCredentials: true })
       .then(response => {
         setLikesUsers(response.data);
         setLikesModalOpen(true);
