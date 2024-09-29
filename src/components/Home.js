@@ -29,7 +29,7 @@ const Home = () => {
       setUsername(savedUsername);
     }
 
-    axios.get('${API_BASE_URL}/palettes/public')
+    axios.get(`${API_BASE_URL}/palettes/public`)
       .then(response => setPublicPalettes(response.data))
       .catch(error => console.error('Error fetching public palettes:', error));
 
@@ -39,10 +39,10 @@ const Home = () => {
         .catch(error => console.error('Error fetching liked palettes:', error));
     }
 
-    axios.get('${API_BASE_URL}/arts/public')
+    axios.get(`${API_BASE_URL}/arts/public`)
       .then(response => setPublicArts(response.data))
       .catch(error => console.error('Error fetching public arts:', error));
-  }, []);
+  }, [API_BASE_URL]);
 
   const handleShowLikes = (itemId, type) => {
     const endpoint = type === 'palette' ? `palettes/${itemId}/likes/users` : `arts/${itemId}/likes/users`;
@@ -297,7 +297,7 @@ const Home = () => {
                         alt={`${user.username}'s avatar`}
                         className="w-10 h-10 rounded-full"
                         onError={(e) => {
-                        "none"; // Скрываем изображение, если оно не загружается
+                            e.target.style.display = 'none';
                         }}
                       />
                     )}
