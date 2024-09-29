@@ -100,7 +100,11 @@ const UserProfile = () => {
       <Navbar />
       <div className="container mx-auto py-8 text-center">
         {avatar && avatar !== `${API_BASE_URL}` && (
-          <img src={avatar} alt="/default_avatar.png" className="rounded-full h-32 w-32 object-cover mx-auto mb-4" />
+          <img
+            src={avatar ? avatar : "/default_avatar.png"}
+            alt="User Avatar"
+            className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
+          />
         )}
         <h1 className="text-3xl font-bold text-secondary">{user?.username}</h1>
 
@@ -253,12 +257,9 @@ const UserProfile = () => {
                       <div key={index} className="flex items-center space-x-2">
                         {user.avatarPath && (
                           <img
-                            src={`${API_BASE_URL}${user.avatarPath}`}
-                            alt="/default_avatar.png"
-                            className="w-10 h-10 rounded-full"
-                            onError={(e) => {
-                              e.target.style.display = "none"; // Скрываем изображение, если оно не загружается
-                            }}
+                            src={avatar ? avatar : "/default_avatar.png"}  // Если avatar не найден, загружаем default_avatar.png
+                            alt="User Avatar"
+                            className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
                           />
                         )}
                         <p className="text-black">{user.username}</p>
