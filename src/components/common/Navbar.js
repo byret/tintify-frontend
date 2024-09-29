@@ -32,7 +32,7 @@ const Navbar = ({
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <Link to="/">
-            <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="Logo" className="h-16" />
+            <img src="/logo.png`" alt="Logo" className="h-16" />
           </Link>
           <Link to="/">
             <span className="text-white text-2xl font-semibold font-sans">Tintify</span>
