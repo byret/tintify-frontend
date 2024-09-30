@@ -7,6 +7,7 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(null);  // Для отслеживания успешности регистрации
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
   const handleRegister = async (e) => {
@@ -19,8 +20,10 @@ const Register = () => {
 
       if (response.status === 200) {
         setMessage('Registration successful! You can now login.');
+        setIsSuccess(true);  // Устанавливаем флаг успеха
       } else {
         setMessage('Registration failed. Please try again.');
+        setIsSuccess(false);  // Устанавливаем флаг неудачи
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -28,6 +31,7 @@ const Register = () => {
       } else {
         setMessage('An error occurred during registration. Please try again.');
       }
+      setIsSuccess(false);  // Устанавливаем флаг неудачи
     }
   };
 
@@ -38,7 +42,9 @@ const Register = () => {
         <h1 className="text-3xl font-bold text-secondary mb-6 text-center">Register</h1>
 
         {message && (
-          <p className="text-center mb-4 text-red-500">{message}</p>
+          <p className={`text-center mb-4 ${isSuccess ? 'text-green-500' : 'text-red-500'}`}>
+            {message}
+          </p>
         )}
 
         <form onSubmit={handleRegister}>
