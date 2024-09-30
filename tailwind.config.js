@@ -12,7 +12,8 @@ module.exports = {
         areasBg: '#fefefc',
         secondaryAreasBg: '#f6e8e7',
         activeBg: '#f47f88',
-        inactiveBg: '#e5d1d2'
+        inactiveBg: '#e5d1d2',
+        blocked: '#bfbfbe'
       },
       fontFamily: {
         sans: ['nokiafc22', 'Arial', 'sans-serif'],
