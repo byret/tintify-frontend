@@ -100,11 +100,11 @@ const UserProfile = () => {
       <Navbar />
       <div className="container mx-auto py-8 text-center">
         {avatar && avatar !== `${API_BASE_URL}` && (
-            <img
-              src={avatar && avatar !== `${API_BASE_URL}` ? avatar : `${process.env.PUBLIC_URL}/default_avatar.png`}
-              alt="User Avatar"
-              className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
-            />
+          <img
+            src={avatar ? avatar : "/default_avatar.png"}
+            alt="User Avatar"
+            className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
+          />
         )}
         <h1 className="text-3xl font-bold text-secondary">{user?.username}</h1>
 
@@ -256,11 +256,11 @@ const UserProfile = () => {
                     likesUsers.map((user, index) => (
                       <div key={index} className="flex items-center space-x-2">
                         {user.avatarPath && (
-                            <img
-                              src={avatar && avatar !== `${API_BASE_URL}` ? avatar : `${process.env.PUBLIC_URL}/default_avatar.png`}
-                              alt="User Avatar"
-                              className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
-                            />
+                          <img
+                            src={avatar ? avatar : "/default_avatar.png"}
+                            alt="User Avatar"
+                            className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
+                          />
                         )}
                         <p className="text-black">{user.username}</p>
                       </div>

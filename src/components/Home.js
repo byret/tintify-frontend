@@ -101,12 +101,12 @@ const Home = () => {
 
   const handleCreateArt = () => {
     closeCreateModal();
-    window.location.href = `/create-art?public=${!isAuthenticated}`;
+    navigate(`/create-art?public=${!isAuthenticated}`);
   };
 
   const handleCreatePalette = () => {
     closeCreateModal();
-    window.location.href = `/create-palette?public=${!isAuthenticated}`;
+    navigate(`/create-palette?public=${!isAuthenticated}`);
   };
 
   return (
@@ -117,7 +117,7 @@ const Home = () => {
         handleLogout={() => {
           sessionStorage.removeItem('authToken');
           sessionStorage.removeItem('username');
-          window.location.href = '/login';
+          navigate('/login');
         }}
         onHomePage={true}
         openModal={openCreateModal}
