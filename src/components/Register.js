@@ -6,8 +6,11 @@ import Navbar from './common/Navbar';
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // Поле для подтверждения пароля
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(null);  // Для отслеживания успешности регистрации
+  const [showTooltip, setShowTooltip] = useState(false); // Для управления всплывающим уведомлением
+
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
   const handleRegister = async (e) => {
@@ -35,6 +38,9 @@ const Register = () => {
     }
   };
 
+  // Функция для проверки совпадения паролей
+  const passwordsMatch = password === confirmPassword && password.length > 0;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-pixelBg">
       <Navbar />
@@ -42,7 +48,12 @@ const Register = () => {
         <h1 className="text-3xl font-bold text-secondary mb-6 text-center">Register</h1>
 
         {message && (
-          <p className={`text-center mb-4 ${isSuccess ? 'text-green-500' : 'text-red-500'}`}>
+          <p
+            className="text-center mb-4"
+            style={{
+              color: isSuccess ? '#9BCF8C' : '#913737',  // Цвет через HEX
+            }}
+          >
             {message}
           </p>
         )}
@@ -59,7 +70,7 @@ const Register = () => {
             />
           </div>
 
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
               type="password"
@@ -70,11 +81,30 @@ const Register = () => {
             />
           </div>
 
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+
           <button
             type="submit"
-            className="w-full text-secondary bg-primary py-2 px-4 rounded hover:bg-secondary hover:text-primary transition-all"
+            className="w-full text-secondary bg-primary py-2 px-4 rounded hover:bg-secondary hover:text-primary transition-all relative"
+            disabled={!passwordsMatch} // Блокируем кнопку, если пароли не совпадают
+            onMouseEnter={() => !passwordsMatch && setShowTooltip(true)} // Показываем подсказку, если пароли не совпадают
+            onMouseLeave={() => setShowTooltip(false)} // Прячем подсказку
           >
             Register
+            {!passwordsMatch && showTooltip && (
+              <div className="absolute top-full left-0 bg-red-500 text-white p-2 rounded shadow-lg mt-1">
+                Passwords must match!
+              </div>
+            )}
           </button>
         </form>
 
