@@ -19,6 +19,7 @@ const Home = () => {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
   const modalRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
