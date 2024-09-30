@@ -25,8 +25,8 @@ const handleLogin = async (e) => {
     const { message, redirectUrl } = response.data;
 
     if (message === 'Login successful') {
-      sessionStorage.setItem('authToken', 'true');
-      sessionStorage.setItem('username', username);  // Сохраняем введённый username
+      sessionStorage.setItem('username', username);
+      sessionStorage.setItem('authToken', response.data.token);
 
       // Перенаправление на указанный URL
       if (redirectUrl) {
