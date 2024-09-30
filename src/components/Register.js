@@ -28,10 +28,10 @@ const Register = () => {
 
       if (response.status === 200) {
         setMessage('Registration successful! You can now login.');
-        setIsSuccess(true);  // Устанавливаем флаг успеха
+        setIsSuccess(true);
       } else {
         setMessage('Registration failed. Please try again.');
-        setIsSuccess(false);  // Устанавливаем флаг неудачи
+        setIsSuccess(false);
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -39,7 +39,7 @@ const Register = () => {
       } else {
         setMessage('An error occurred during registration. Please try again.');
       }
-      setIsSuccess(false);  // Устанавливаем флаг неудачи
+      setIsSuccess(false);
     }
   };
 
@@ -94,7 +94,7 @@ const Register = () => {
           <p
             className="text-center mb-4"
             style={{
-              color: isSuccess ? '#9BCF8C' : '#913737',  // Цвет через HEX
+              color: isSuccess ? '#9BCF8C' : '#913737',
             }}
           >
             {message}
