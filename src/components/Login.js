@@ -23,6 +23,7 @@ const handleLogin = async (e) => {
     });
 
     const { message, redirectUrl } = response.data;
+    console.log(response.data);
 
     if (message === 'Login successful') {
       sessionStorage.setItem('username', username);
