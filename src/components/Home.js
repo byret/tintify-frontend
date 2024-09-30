@@ -18,6 +18,7 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
+  const createModalRef = useRef(null);
   const modalRef = useRef(null);
   const navigate = useNavigate();
 
@@ -59,6 +60,18 @@ const Home = () => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
         setLikesModalOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (createModalRef.current && !createModalRef.current.contains(event.target)) {
+        setIsModalOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -126,27 +139,29 @@ const Home = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
-            <h2 className="text-2xl font-bold mb-4">Choose an option</h2>
-            <button
-              onClick={handleCreateArt}
-              className="bg-primary text-secondary py-2 px-4 rounded mb-4 hover:text-primary hover:bg-secondary transition-all w-full"
-            >
-              Create Art
-            </button>
-            <button
-              onClick={handleCreatePalette}
-              className="bg-primary text-secondary py-2 px-4 rounded hover:text-primary hover:bg-secondary transition-all w-full"
-            >
-              Create Palette
-            </button>
-            <button
-              onClick={closeCreateModal}
-              className="mt-4 text-gray-500 hover:text-black"
-            >
-              Cancel
-            </button>
-          </div>
+          <div ref={createModalRef}>
+              <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+                <h2 className="text-2xl text-secondary font-bold mb-4">Choose an option</h2>
+                <button
+                  onClick={handleCreateArt}
+                  className="bg-primary text-secondary py-2 px-4 rounded mb-4 hover:text-primary hover:bg-secondary transition-all w-full"
+                >
+                  Create Art
+                </button>
+                <button
+                  onClick={handleCreatePalette}
+                  className="bg-primary text-secondary py-2 px-4 rounded hover:text-primary hover:bg-secondary transition-all w-full"
+                >
+                  Create Palette
+                </button>
+                <button
+                  onClick={closeCreateModal}
+                  className="mt-4 text-gray-500 hover:text-black"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
         </div>
       )}
 
@@ -173,8 +188,8 @@ const Home = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={`Search ${activeCategory === 'palettes' ? 'palettes' : 'arts'} by name...`}
-              className="px-4 py-2 border rounded w-full"
-            />
+              className="px-4 py-2 border rounded w-full max-w-[410px]"
+              />
           </div>
 
           {activeCategory === 'palettes' && (
@@ -302,11 +317,11 @@ const Home = () => {
                         }}
                       />
                     )}
-                    <p className="text-black">{user.username}</p>
+                    <p className="text-secondary">{user.username}</p>
                   </div>
                 ))
               ) : (
-                <p className="text-black">No likes yet.</p>
+                <p className="text-secondary">No likes yet.</p>
               )}
             </div>
           </div>

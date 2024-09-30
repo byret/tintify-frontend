@@ -262,11 +262,11 @@ const UserProfile = () => {
                             className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
                           />
                         )}
-                        <p className="text-black">{user.username}</p>
+                        <p className="text-secondary">{user.username}</p>
                       </div>
                     ))
                   ) : (
-                    <p className="text-black">No likes yet.</p>
+                    <p className="text-secondary">No likes yet.</p>
                   )}
                 </div>
               </div>
