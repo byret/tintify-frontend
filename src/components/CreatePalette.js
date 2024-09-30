@@ -88,11 +88,7 @@ const CreatePalette = () => {
       const token = sessionStorage.getItem('authToken');
 
       await axios.post(`${API_BASE_URL}/palettes/create`, paletteData, {
-        withCredentials: true,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        withCredentials: true
       });
 
       closeModal();
