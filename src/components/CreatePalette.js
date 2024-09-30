@@ -85,8 +85,6 @@ const CreatePalette = () => {
         isPublic: isPublic
       };
 
-      const token = sessionStorage.getItem('authToken');
-
       await axios.post(`${API_BASE_URL}/palettes/create`, paletteData, {
         withCredentials: true
       });
