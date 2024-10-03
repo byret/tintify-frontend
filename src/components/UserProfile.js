@@ -2,8 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
 import Navbar from './common/Navbar';
-import likeIcon from '../assets/like-icon.png';
-import likedIcon from '../assets/liked-icon.png';
 
 const UserProfile = () => {
   const { username } = useParams();
