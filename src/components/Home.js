@@ -46,6 +46,12 @@ const Home = () => {
       .catch(error => console.error('Error fetching public arts:', error));
   }, [API_BASE_URL]);
 
+  const filterItemsByName = (items) => {
+    return items.filter(item =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
   const handleShowLikes = (itemId, type) => {
     const endpoint = type === 'palette' ? `palettes/${itemId}/likes/users` : `arts/${itemId}/likes/users`;
     axios.get(`${API_BASE_URL}/${endpoint}`, { withCredentials: true })
@@ -140,28 +146,25 @@ const Home = () => {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div ref={createModalRef}>
-              <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
-                <h2 className="text-2xl text-secondary font-bold mb-4">Choose an option</h2>
-                <button
-                  onClick={handleCreateArt}
-                  className="bg-primary text-secondary py-2 px-4 rounded mb-4 hover:text-primary hover:bg-secondary transition-all w-full"
-                >
-                  Create Art
-                </button>
-                <button
-                  onClick={handleCreatePalette}
-                  className="bg-primary text-secondary py-2 px-4 rounded hover:text-primary hover:bg-secondary transition-all w-full"
-                >
-                  Create Palette
-                </button>
-                <button
-                  onClick={closeCreateModal}
-                  className="mt-4 text-gray-500 hover:text-black"
-                >
-                  Cancel
-                </button>
-              </div>
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+              <h2 className="text-2xl text-secondary font-bold mb-4">Choose an option</h2>
+              <button
+                onClick={handleCreateArt}
+                className="bg-primary text-secondary py-2 px-4 rounded mb-4 hover:text-primary hover:bg-secondary transition-all w-full"
+              >
+                Create Art
+              </button>
+              <button
+                onClick={handleCreatePalette}
+                className="bg-primary text-secondary py-2 px-4 rounded hover:text-primary hover:bg-secondary transition-all w-full"
+              >
+                Create Palette
+              </button>
+              <button onClick={closeCreateModal} className="mt-4 text-gray-500 hover:text-black">
+                Cancel
+              </button>
             </div>
+          </div>
         </div>
       )}
 
@@ -170,13 +173,17 @@ const Home = () => {
           <div className="text-center mb-8">
             <button
               onClick={() => setActiveCategory('palettes')}
-              className={`px-4 py-2 mx-2 ${activeCategory === 'palettes' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg'}`}
+              className={`px-4 py-2 mx-2 ${
+                activeCategory === 'palettes' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg'
+              }`}
             >
               Palettes
             </button>
             <button
               onClick={() => setActiveCategory('arts')}
-              className={`px-4 py-2 mx-2 ${activeCategory === 'arts' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg'}`}
+              className={`px-4 py-2 mx-2 ${
+                activeCategory === 'arts' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg'
+              }`}
             >
               Arts
             </button>
@@ -189,7 +196,7 @@ const Home = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={`Search ${activeCategory === 'palettes' ? 'palettes' : 'arts'} by name...`}
               className="px-4 py-2 border rounded w-full max-w-[410px]"
-              />
+            />
           </div>
 
           {activeCategory === 'palettes' && (
@@ -197,32 +204,43 @@ const Home = () => {
               <h2 className="text-2xl font-bold text-secondary mb-4 text-center">Public Palettes</h2>
               <div className="flex justify-center">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {publicPalettes.length > 0 ? (
-                    publicPalettes.map((palette, index) => (
-                      <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg" style={{ width: 'fit-content' }}>
+                  {filterItemsByName(publicPalettes).length > 0 ? (
+                    filterItemsByName(publicPalettes).map((palette, index) => (
+                      <div
+                        key={index}
+                        className="p-4 rounded-lg shadow-md bg-areasBg"
+                        style={{ width: 'fit-content' }}
+                      >
                         <h3 className="text-lg font-bold mb-2 text-secondary">{palette.name}</h3>
-                        <p className="text-sm text-secondary mb-2">by {palette.user?.username ? (
-                          <Link to={`/users/${palette.user.username}`} className="underline">
-                            {palette.user.username}
-                          </Link>
-                        ) : 'Unknown'}</p>
+                        <p className="text-sm text-secondary mb-2">
+                          by{' '}
+                          {palette.user?.username ? (
+                            <Link to={`/users/${palette.user.username}`} className="underline">
+                              {palette.user.username}
+                            </Link>
+                          ) : (
+                            'Unknown'
+                          )}
+                        </p>
                         <div className="grid grid-cols-4 gap-0 mb-4">
                           {palette.colors.map((color, idx) => (
-                            <div
-                              key={idx}
-                              className="w-6 h-6"
-                              style={{ backgroundColor: color }}
-                            />
+                            <div key={idx} className="w-6 h-6" style={{ backgroundColor: color }} />
                           ))}
                         </div>
                         <div className="flex items-center justify-start">
                           <button
                             onClick={() => handleLike(palette.id)}
-                            className={`flex items-center ${!isAuthenticated || palette.user?.username === username ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 transition-transform'}`}
+                            className={`flex items-center ${
+                              !isAuthenticated || palette.user?.username === username
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'hover:scale-105 transition-transform'
+                            }`}
                             disabled={!isAuthenticated || palette.user?.username === username}
                           >
                             <img
-                              src={likedPalettes.some(p => p.id === palette.id) ? likedIcon : likeIcon}
+                              src={
+                                likedPalettes.some((p) => p.id === palette.id) ? likedIcon : likeIcon
+                              }
                               alt="Like"
                               className="h-6 w-6 mr-2"
                             />
@@ -252,11 +270,16 @@ const Home = () => {
                   publicArts.map((art, index) => (
                     <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg">
                       <h3 className="text-lg font-bold mb-2 text-secondary">{art.name}</h3>
-                      <p className="text-sm text-secondary mb-2">by {art.user?.username ? (
-                        <Link to={`/users/${art.user.username}`} className="underline">
-                          {art.user.username}
-                        </Link>
-                      ) : 'Unknown'}</p>
+                      <p className="text-sm text-secondary mb-2">
+                        by{' '}
+                        {art.user?.username ? (
+                          <Link to={`/users/${art.user.username}`} className="underline">
+                            {art.user.username}
+                          </Link>
+                        ) : (
+                          'Unknown'
+                        )}
+                      </p>
                       <div
                         className="grid"
                         style={{
@@ -291,8 +314,13 @@ const Home = () => {
       {likesModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div ref={modalRef} className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full">
-            <h2 className="text-2xl text-secondary font-bold mb-4">Users who liked this palette</h2>
-            <button onClick={() => setLikesModalOpen(false)} className="absolute top-2 right-2 text-gray-500 hover:text-black">
+            <h2 className="text-2xl text-secondary font-bold mb-4">
+              Users who liked this palette
+            </h2>
+            <button
+              onClick={() => setLikesModalOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            >
               Close
             </button>
             <div className="grid grid-cols-3 gap-4">
@@ -305,7 +333,7 @@ const Home = () => {
                         alt={`${user.username}'s avatar`}
                         className="w-10 h-10 rounded-full"
                         onError={(e) => {
-                            e.target.style.display = 'none';
+                          e.target.style.display = 'none';
                         }}
                       />
                     )}
@@ -320,6 +348,7 @@ const Home = () => {
         </div>
       )}
     </div>
+
   );
 };
 

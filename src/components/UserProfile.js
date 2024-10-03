@@ -156,7 +156,7 @@ const UserProfile = () => {
                             className={`flex items-center ${currentUser === username ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 transition-transform'}`}
                           >
                             <img
-                              src={isPaletteLiked(palette.id) ? likedIcon : likeIcon}
+                              src={isPaletteLiked(palette.id) ? process.env.PUBLIC_URL + '/liked-icon.png' : process.env.PUBLIC_URL + '/like-icon.png'}
                               alt="Like"
                               className="h-6 w-6 mr-2"
                             />
