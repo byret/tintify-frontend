@@ -171,10 +171,10 @@ const CreatePalette = () => {
       {isSaveModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">Save palette</h2>
+            <h2 className="text-2xl text-secondary font-bold mb-4">Save palette</h2>
 
             <div className="mb-4">
-              <label className="block mb-2">Palette name:</label>
+              <label className="block text-secondary mb-2">Palette name:</label>
               <input
                 type="text"
                 value={paletteName}
@@ -185,7 +185,7 @@ const CreatePalette = () => {
             </div>
 
             <div className="mb-4">
-              <label className="inline-flex items-center">
+              <label className="inline-flex items-center  text-secondary">
                 <input
                   type="checkbox"
                   checked={isPublic}

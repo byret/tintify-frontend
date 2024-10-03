@@ -51,7 +51,7 @@ const Navbar = ({
         {isAuthenticated && onHomePage ? (
           <>
             <div
-              className="relative"
+              className="absolute left-1/2 transform -translate-x-1/2"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >

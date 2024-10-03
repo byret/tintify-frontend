@@ -277,14 +277,6 @@ const Home = () => {
                           />
                         ))}
                       </div>
-                      <div className="flex items-center justify-start mt-4">
-                        <span
-                          className="text-secondary text-xs cursor-pointer"
-                          onClick={() => handleShowLikes(art.id, 'art')}
-                        >
-                          {art.likes} Likes
-                        </span>
-                      </div>
                     </div>
                   ))
                 ) : (
