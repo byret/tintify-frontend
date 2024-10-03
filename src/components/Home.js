@@ -93,7 +93,7 @@ const Home = () => {
 
     const alreadyLiked = likedPalettes.some(palette => palette.id === paletteId);
 
-    axios.post(`${API_BASE_URL}/palettes/${paletteId}/like`, { withCredentials: true })
+    axios.post(`${API_BASE_URL}/palettes/${paletteId}/like`, {}, { withCredentials: true })
       .then(() => {
         if (alreadyLiked) {
           setPublicPalettes(publicPalettes.map(palette =>
