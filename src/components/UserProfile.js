@@ -168,7 +168,7 @@ const UserProfile = () => {
                             }}
                             style={{ cursor: currentUser === username ? 'pointer' : 'default' }}
                           >
-                            {palette.likes} Likes
+                            {palette.likes === 1 ? `${palette.likes} like` : `${palette.likes} likes`}
                           </span>
                         </div>
                       </div>
