@@ -22,7 +22,7 @@ const Home = () => {
 
   const createModalRef = useRef(null);
   const paletteModalRef = useRef(null);
-  const modalRef = useRef(null);
+  const likesModalRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,34 +65,10 @@ const Home = () => {
       .catch(error => console.error('Error fetching users who liked the item:', error));
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setLikesModalOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (createModalRef.current && !createModalRef.current.contains(event.target)) {
-        setIsModalOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Добавляем обработчик для закрытия модального окна с палитрой
+  // Закрытие окна палитры при клике вне
   useEffect(() => {
     const handleClickOutsidePalette = (event) => {
-      if (paletteModalRef.current && !paletteModalRef.current.contains(event.target)) {
+      if (paletteModalOpen && paletteModalRef.current && !paletteModalRef.current.contains(event.target) && !likesModalOpen) {
         setPaletteModalOpen(false);
       }
     };
@@ -100,7 +76,20 @@ const Home = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutsidePalette);
     };
-  }, []);
+  }, [paletteModalOpen, likesModalOpen]);
+
+  // Закрытие окна лайков при клике вне
+  useEffect(() => {
+    const handleClickOutsideLikes = (event) => {
+      if (likesModalOpen && likesModalRef.current && !likesModalRef.current.contains(event.target)) {
+        setLikesModalOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutsideLikes);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideLikes);
+    };
+  }, [likesModalOpen]);
 
   const handleLike = (paletteId) => {
     if (!isAuthenticated || publicPalettes.find(palette => palette.id === paletteId)?.user?.username === username) {
@@ -111,17 +100,22 @@ const Home = () => {
 
     axios.post(`${API_BASE_URL}/palettes/${paletteId}/like`, {}, { withCredentials: true })
       .then(() => {
+        setPublicPalettes(publicPalettes.map(palette =>
+          palette.id === paletteId ? { ...palette, likes: alreadyLiked ? palette.likes - 1 : palette.likes + 1 } : palette
+        ));
+
         if (alreadyLiked) {
-          setPublicPalettes(publicPalettes.map(palette =>
-            palette.id === paletteId ? { ...palette, likes: palette.likes - 1 } : palette
-          ));
           setLikedPalettes(likedPalettes.filter(palette => palette.id !== paletteId));
         } else {
-          setPublicPalettes(publicPalettes.map(palette =>
-            palette.id === paletteId ? { ...palette, likes: palette.likes + 1 } : palette
-          ));
           const likedPalette = publicPalettes.find(palette => palette.id === paletteId);
           setLikedPalettes([...likedPalettes, likedPalette]);
+        }
+
+        if (selectedPalette && selectedPalette.id === paletteId) {
+          setSelectedPalette({
+            ...selectedPalette,
+            likes: alreadyLiked ? selectedPalette.likes - 1 : selectedPalette.likes + 1
+          });
         }
       })
       .catch((error) => console.error('Error liking/unliking palette:', error));
@@ -148,11 +142,6 @@ const Home = () => {
   const handleOpenPaletteModal = (palette) => {
     setSelectedPalette(palette);
     setPaletteModalOpen(true);
-  };
-
-  const handleClosePaletteModal = () => {
-    setPaletteModalOpen(false);
-    setSelectedPalette(null);
   };
 
   return (
@@ -352,7 +341,7 @@ const Home = () => {
 
       {likesModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div ref={modalRef} className="bg-areasBg p-6 rounded-lg shadow-lg max-w-3xl w-full">
+          <div ref={likesModalRef} className="bg-areasBg p-6 rounded-lg shadow-lg max-w-3xl w-full">
             <h2 className="text-2xl text-secondary font-bold mb-4">
               Users who liked this palette
             </h2>
