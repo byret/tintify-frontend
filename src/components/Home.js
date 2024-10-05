@@ -170,7 +170,7 @@ const Home = () => {
 
       <div className="pt-16">
         <div className="container mx-auto py-8 px-16">
-          <div className="text-center mb-8">
+          <div className="text-center text-secondary mb-8">
             <button
               onClick={() => setActiveCategory('palettes')}
               className={`px-4 py-2 mx-2 ${
@@ -205,54 +205,56 @@ const Home = () => {
               <div className="flex justify-center">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {filterItemsByName(publicPalettes).length > 0 ? (
-                    filterItemsByName(publicPalettes).map((palette, index) => (
-                      <div
-                        key={index}
-                        className="p-4 rounded-lg shadow-md bg-areasBg"
-                        style={{ width: 'fit-content' }}
-                      >
-                        <h3 className="text-lg font-bold mb-2 text-secondary">{palette.name}</h3>
-                        <p className="text-sm text-secondary mb-2">
-                          by{' '}
-                          {palette.user?.username ? (
-                            <Link to={`/users/${palette.user.username}`} className="underline">
-                              {palette.user.username}
-                            </Link>
-                          ) : (
-                            'Unknown'
-                          )}
-                        </p>
-                        <div className="grid grid-cols-4 gap-0 mb-4">
-                          {palette.colors.map((color, idx) => (
-                            <div key={idx} className="w-6 h-6" style={{ backgroundColor: color }} />
-                          ))}
-                        </div>
-                        <div className="flex items-center justify-start">
-                          <button
-                            onClick={() => handleLike(palette.id)}
-                            className={`flex items-center ${
-                              !isAuthenticated || palette.user?.username === username
-                                ? 'opacity-50 cursor-not-allowed'
-                                : 'hover:scale-105 transition-transform'
-                            }`}
-                            disabled={!isAuthenticated || palette.user?.username === username}
+                    filterItemsByName(publicPalettes)
+                      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                        .map((palette, index) => (
+                          <div
+                            key={index}
+                            className="p-4 rounded-lg shadow-md bg-areasBg"
+                            style={{ width: 'fit-content' }}
                           >
-                            <img
-                              src={
-                                likedPalettes.some((p) => p.id === palette.id) ? likedIcon : likeIcon
-                              }
-                              alt="Like"
-                              className="h-6 w-6 mr-2"
-                            />
-                          </button>
-                          <span
-                            className="text-secondary text-xs cursor-pointer"
-                            onClick={() => handleShowLikes(palette.id, 'palette')}
-                          >
-                            {palette.likes === 1 ? `${palette.likes} like` : `${palette.likes} likes`}
-                          </span>
-                        </div>
-                      </div>
+                            <h3 className="text-lg font-bold mb-2 text-secondary">{palette.name}</h3>
+                            <p className="text-sm text-secondary mb-2">
+                              by{' '}
+                              {palette.user?.username ? (
+                                <Link to={`/users/${palette.user.username}`} className="underline">
+                                  {palette.user.username}
+                                </Link>
+                              ) : (
+                                'Unknown'
+                              )}
+                            </p>
+                            <div className="grid grid-cols-4 gap-0 mb-4">
+                              {palette.colors.map((color, idx) => (
+                                <div key={idx} className="w-6 h-6" style={{ backgroundColor: color }} />
+                              ))}
+                            </div>
+                            <div className="flex items-center justify-start">
+                              <button
+                                onClick={() => handleLike(palette.id)}
+                                className={`flex items-center ${
+                                  !isAuthenticated || palette.user?.username === username
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'hover:scale-105 transition-transform'
+                                }`}
+                                disabled={!isAuthenticated || palette.user?.username === username}
+                              >
+                                <img
+                                  src={
+                                    likedPalettes.some((p) => p.id === palette.id) ? likedIcon : likeIcon
+                                  }
+                                  alt="Like"
+                                  className="h-6 w-6 mr-2"
+                                />
+                              </button>
+                              <span
+                                className="text-secondary text-xs cursor-pointer"
+                                onClick={() => handleShowLikes(palette.id, 'palette')}
+                              >
+                                {palette.likes === 1 ? `${palette.likes} like` : `${palette.likes} likes`}
+                              </span>
+                            </div>
+                          </div>
                     ))
                   ) : (
                     <p className="text-secondary">No public palettes available.</p>
@@ -266,41 +268,43 @@ const Home = () => {
             <>
               <h2 className="text-2xl font-bold text-secondary mb-4 text-center">Public Arts</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {publicArts.length > 0 ? (
-                  publicArts.map((art, index) => (
-                    <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg">
-                      <h3 className="text-lg font-bold mb-2 text-secondary">{art.name}</h3>
-                      <p className="text-sm text-secondary mb-2">
-                        by{' '}
-                        {art.user?.username ? (
-                          <Link to={`/users/${art.user.username}`} className="underline">
-                            {art.user.username}
-                          </Link>
-                        ) : (
-                          'Unknown'
-                        )}
-                      </p>
-                      <div
-                        className="grid"
-                        style={{
-                          gridTemplateColumns: `repeat(${art.width}, 1fr)`,
-                          gap: '0px',
-                          width: `${art.width * 20}px`,
-                          height: `${art.height * 20}px`,
-                        }}
-                      >
-                        {art.pixels.map((color, idx) => (
+                {filterItemsByName(publicArts).length > 0 ? (
+                  filterItemsByName(publicArts)
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                      .map((art, index) => (
+                        <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg">
+                          <h3 className="text-lg font-bold mb-2 text-secondary">{art.name}</h3>
+                          <p className="text-sm text-secondary mb-2">
+                            by{' '}
+                            {art.user?.username ? (
+                              <Link to={`/users/${art.user.username}`} className="underline">
+                                {art.user.username}
+                              </Link>
+                            ) : (
+                              'Unknown'
+                            )}
+                          </p>
                           <div
-                            key={idx}
+                            className="grid"
                             style={{
-                              backgroundColor: color,
-                              width: '100%',
-                              height: '100%',
+                              gridTemplateColumns: `repeat(${art.width}, 1fr)`,
+                              gap: '0px',
+                              width: `${art.width * 20}px`,
+                              height: `${art.height * 20}px`,
                             }}
-                          />
-                        ))}
-                      </div>
-                    </div>
+                          >
+                            {art.pixels.map((color, idx) => (
+                              <div
+                                key={idx}
+                                style={{
+                                  backgroundColor: color,
+                                  width: '100%',
+                                  height: '100%',
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
                   ))
                 ) : (
                   <p className="text-secondary">No public arts available.</p>

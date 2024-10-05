@@ -133,7 +133,7 @@ const UserProfile = () => {
               <h2 className="text-2xl font-semibold text-secondary mb-4">Palettes</h2>
               {palettes.length > 0 ? (
                 <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {palettes.map((palette, index) => (
+                  {palettes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((palette, index) => (
                     <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg">
                       <h3 className="text-lg font-bold mb-2 text-secondary">{palette.name}</h3>
                       <p className="text-sm text-secondary mb-4">by <Link to={`/users/${palette.user.username}`} className="underline">{palette.user.username}</Link></p>
@@ -186,7 +186,7 @@ const UserProfile = () => {
               <h2 className="text-2xl font-semibold text-secondary mb-4">Liked Palettes</h2>
               {likedPalettes.length > 0 ? (
                 <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {likedPalettes.map((palette, index) => (
+                  {likedPalettes.sort((a, b) => new Date(b.likedAt) - new Date(a.likedAt)).map((palette, index) => (
                     <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg">
                       <h3 className="text-lg font-bold mb-2 text-secondary">{palette.name}</h3>
                       <p className="text-sm text-secondary mb-4">by <Link to={`/users/${palette.user.username}`} className="underline">{palette.user.username}</Link></p>
@@ -213,7 +213,7 @@ const UserProfile = () => {
               <h2 className="text-2xl font-semibold text-secondary mb-4">Arts</h2>
               {arts.length > 0 ? (
                 <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {arts.map((art, index) => (
+                  {arts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((art, index) => (
                     <div key={index} className="flex flex-col items-center">
                       <h3 className="text-lg font-bold mb-2 text-secondary">{art.name}</h3>
                       <div
