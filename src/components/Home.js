@@ -249,7 +249,7 @@ const Home = () => {
                             className="text-secondary text-xs cursor-pointer"
                             onClick={() => handleShowLikes(palette.id, 'palette')}
                           >
-                            {palette.likes} Likes
+                            {palette.likes === 1 ? `${palette.likes} like` : `${palette.likes} likes`}
                           </span>
                         </div>
                       </div>
