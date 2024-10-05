@@ -214,31 +214,19 @@ const Home = () => {
             <>
               <h2 className="text-2xl font-bold text-secondary mb-4 text-center">Public Palettes</h2>
               <div className="flex justify-center">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
                   {filterItemsByName(publicPalettes).length > 0 ? (
                     filterItemsByName(publicPalettes)
                       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                       .map((palette, index) => (
                         <div
                           key={index}
-                          className="p-4 rounded-lg shadow-md bg-areasBg"
                           style={{ width: 'fit-content', cursor: 'pointer' }}
                           onClick={() => handleOpenPaletteModal(palette)}
                         >
-                          <h3 className="text-lg font-bold mb-2 text-secondary">{palette.name}</h3>
-                          <p className="text-sm text-secondary mb-2">
-                            by{' '}
-                            {palette.user?.username ? (
-                              <Link to={`/users/${palette.user.username}`} className="underline">
-                                {palette.user.username}
-                              </Link>
-                            ) : (
-                              'Unknown'
-                            )}
-                          </p>
                           <div className="grid grid-cols-4 gap-0 mb-4" style={{ width: 'fit-content' }}>
                             {palette.colors.map((color, idx) => (
-                              <div key={idx} className="w-6 h-6" style={{ backgroundColor: color }} />
+                              <div key={idx} className="w-32 h-32" style={{ backgroundColor: color }} />
                             ))}
                           </div>
                         </div>
@@ -316,6 +304,16 @@ const Home = () => {
                 <p key={idx} className="text-sm">{color}</p>
               ))}
             </div>
+            <p className="text-sm text-secondary mb-2">
+              by{' '}
+                {selectedPalette.user?.username ? (
+                  <Link to={`/users/${selectedPalette.user.username}`} className="underline">
+                    {selectedPalette.user.username}
+                  </Link>
+                ) : (
+                'Unknown'
+              )}
+            </p>
             <div className="flex items-center justify-center">
               <button
                 onClick={() => handleLike(selectedPalette.id)}
