@@ -14,11 +14,11 @@ const Home = () => {
   const [likedPalettes, setLikedPalettes] = useState([]);
   const [likesModalOpen, setLikesModalOpen] = useState(false);
   const [likesUsers, setLikesUsers] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Модальное окно для выбора Create Art / Palette
-  const [paletteModalOpen, setPaletteModalOpen] = useState(false); // Модальное окно для отображения палитры
-  const [artModalOpen, setArtModalOpen] = useState(false); // Модальное окно для отображения арта
-  const [selectedPalette, setSelectedPalette] = useState(null); // Текущая выбранная палитра
-  const [selectedArt, setSelectedArt] = useState(null); // Текущий выбранный арт
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [paletteModalOpen, setPaletteModalOpen] = useState(false);
+  const [artModalOpen, setArtModalOpen] = useState(false);
+  const [selectedPalette, setSelectedPalette] = useState(null);
+  const [selectedArt, setSelectedArt] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
@@ -68,7 +68,6 @@ const Home = () => {
       .catch(error => console.error('Error fetching users who liked the item:', error));
   };
 
-  // Закрытие окна палитры при клике вне
   useEffect(() => {
     const handleClickOutsidePalette = (event) => {
       if (paletteModalOpen && paletteModalRef.current && !paletteModalRef.current.contains(event.target) && !likesModalOpen) {
@@ -81,7 +80,6 @@ const Home = () => {
     };
   }, [paletteModalOpen, likesModalOpen]);
 
-  // Закрытие окна арта при клике вне
   useEffect(() => {
     const handleClickOutsideArt = (event) => {
       if (artModalOpen && artModalRef.current && !artModalRef.current.contains(event.target)) {
@@ -94,7 +92,6 @@ const Home = () => {
     };
   }, [artModalOpen]);
 
-  // Закрытие окна лайков при клике вне
   useEffect(() => {
     const handleClickOutsideLikes = (event) => {
       if (likesModalOpen && likesModalRef.current && !likesModalRef.current.contains(event.target)) {
@@ -275,8 +272,8 @@ const Home = () => {
                           style={{
                             gridTemplateColumns: `repeat(${art.width}, 1fr)`,
                             gap: '0px',
-                            width: `${artWidth}px`, // Установка ширины арта
-                            height: `${art.height * (artWidth / art.width)}px`, // Подстраивание высоты
+                            width: `${artWidth}px`,
+                            height: `${art.height * (artWidth / art.width)}px`,
                           }}
                         >
                           {art.pixels.map((color, idx) => (
@@ -357,8 +354,8 @@ const Home = () => {
               style={{
                 gridTemplateColumns: `repeat(${selectedArt.width}, 1fr)`,
                 gap: '0px',
-                width: `${artWidth}px`, // Установка ширины арта
-                height: `${selectedArt.height * (artWidth / selectedArt.width)}px`, // Подстраивание высоты
+                width: `${artWidth}px`,
+                height: `${selectedArt.height * (artWidth / selectedArt.width)}px`,
               }}
             >
               {selectedArt.pixels.map((color, idx) => (

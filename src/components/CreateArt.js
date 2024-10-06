@@ -21,11 +21,12 @@ const CreateArt = () => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isFilling, setIsFilling] = useState(false);
 
-  const [undoStack, setUndoStack] = useState([]); // Для отмены
-  const [redoStack, setRedoStack] = useState([]); // Для повтора
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false); // Для открытия окна палитр
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [userPalettes, setUserPalettes] = useState([]);
   const [likedPalettes, setLikedPalettes] = useState([]);
   const [allPalettes, setAllPalettes] = useState([]);
@@ -72,12 +73,12 @@ const CreateArt = () => {
   }, []);
 
   const saveStateForUndo = () => {
-    setUndoStack([...undoStack, pixels]); // Сохраняем текущее состояние в стек отмены
-    setRedoStack([]); // Сбрасываем стек повтора при каждом изменении
+    setUndoStack([...undoStack, pixels]);
+    setRedoStack([]);
   };
 
   const handleColorChange = (color) => {
-    setCurrentColor(color.hex); // Обновляем активный цвет
+    setCurrentColor(color.hex);
     if (selectedPixel !== null) {
       if (selectedPixel < palette.length) {
         const newPalette = [...palette];
@@ -85,16 +86,15 @@ const CreateArt = () => {
         setPalette(newPalette);
       } else {
         const newPixels = [...pixels];
-        newPixels[selectedPixel - palette.length] = color.hex; // Окрашиваем квадрат на рисунке
+        newPixels[selectedPixel - palette.length] = color.hex;
         setPixels(newPixels);
       }
     }
   };
 
   const handleSquareClick = (index, event, isPalette) => {
-    saveStateForUndo(); // Сохраняем состояние перед изменением
+    saveStateForUndo();
     if (isPalette) {
-      // Логика для палитры
       if (activePaletteIndex === index) {
         setActivePaletteIndex(null);
         setCurrentColor('#000000');
@@ -113,8 +113,8 @@ const CreateArt = () => {
       });
     } else {
       // Логика для рисунка
-      setSelectedPixel(index + palette.length); // Устанавливаем выбранный пиксель
-      setPickerVisible(true); // Открываем цветовое колесо
+      setSelectedPixel(index + palette.length);
+      setPickerVisible(true);
       const rect = event.target.getBoundingClientRect();
       setPosition({
         top: rect.top + window.scrollY + rect.height,
@@ -124,7 +124,7 @@ const CreateArt = () => {
   };
 
   const handleMouseDown = (index, isPalette) => {
-    saveStateForUndo(); // Сохраняем состояние перед началом рисования
+    saveStateForUndo();
 
     if (!isPalette) {
       const newPixels = [...pixels];
@@ -149,7 +149,7 @@ const CreateArt = () => {
   const handleUndo = () => {
     if (undoStack.length > 0) {
       const previousState = undoStack.pop();
-      setRedoStack([...redoStack, pixels]); // Сохраняем текущее состояние в стек повтора
+      setRedoStack([...redoStack, pixels]);
       setPixels(previousState);
       setUndoStack([...undoStack]);
     }
@@ -158,7 +158,7 @@ const CreateArt = () => {
   const handleRedo = () => {
     if (redoStack.length > 0) {
       const nextState = redoStack.pop();
-      setUndoStack([...undoStack, pixels]); // Сохраняем текущее состояние в стек отмены
+      setUndoStack([...undoStack, pixels]);
       setPixels(nextState);
       setRedoStack([...redoStack]);
     }
@@ -186,10 +186,9 @@ const CreateArt = () => {
     const newHeight = Math.max(2, Math.min(32, Number(e.target.value)));
     const newPixels = Array(width * newHeight).fill('#ffffff');
 
-    // Копируем старые цвета в новую структуру, если это возможно
     for (let i = 0; i < newHeight; i++) {
       for (let j = 0; j < width; j++) {
-        const oldIndex = i < height ? i * width + j : null; // Избегаем доступа вне диапазона
+        const oldIndex = i < height ? i * width + j : null;
         if (oldIndex !== null && oldIndex < pixels.length) {
           newPixels[i * width + j] = pixels[oldIndex];
         }
@@ -282,8 +281,42 @@ const CreateArt = () => {
       .catch((error) => console.error('Error saving art:', error));
   };
 
-  const closeModal = () => {
-    setIsSaveModalOpen(false);
+  const floodFill = (index) => {
+    const targetColor = pixels[index];
+    const newPixels = [...pixels];
+
+    if (targetColor === currentColor) return;
+
+    const stack = [index];
+
+    while (stack.length) {
+      const currentIndex = stack.pop();
+      if (newPixels[currentIndex] !== targetColor) continue;
+
+      newPixels[currentIndex] = currentColor;
+
+      const neighbors = getNeighbors(currentIndex);
+      neighbors.forEach((neighbor) => {
+        if (newPixels[neighbor] === targetColor) {
+          stack.push(neighbor);
+        }
+      });
+    }
+
+    setPixels(newPixels);
+  };
+
+  const getNeighbors = (index) => {
+    const neighbors = [];
+    const row = Math.floor(index / width);
+    const col = index % width;
+
+    if (row > 0) neighbors.push(index - width);
+    if (row < height - 1) neighbors.push(index + width);
+    if (col > 0) neighbors.push(index - 1);
+    if (col < width - 1) neighbors.push(index + 1);
+
+    return neighbors;
   };
 
   return (
@@ -308,9 +341,7 @@ const CreateArt = () => {
             {palette.map((color, index) => (
               <div
                 key={index}
-                className={`w-[46px] h-[46px] cursor-pointer border ${
-                  activePaletteIndex === index ? 'border-4 border-yellow-500' : ''
-                }`}
+                className={`w-[46px] h-[46px] cursor-pointer border ${activePaletteIndex === index ? 'border-4 border-yellow-500' : ''}`}
                 style={{ backgroundColor: color }}
                 onClick={(e) => handleSquareClick(index, e, true)} // Передаем событие в функцию
               />
@@ -356,6 +387,13 @@ const CreateArt = () => {
                 className="px-2 py-1 rounded text-black"
               />
             </div>
+
+            <button
+              onClick={() => setIsFilling(true)}
+              className="bg-secondary text-primary w-10 h-10 border rounded"
+            >
+              Fill
+            </button>
           </div>
 
           <div className="grid" style={{ gridTemplateColumns: `repeat(${width}, 1fr)` }} onMouseUp={handleMouseUp}>
@@ -370,20 +408,21 @@ const CreateArt = () => {
                 }}
                 onMouseDown={() => handleMouseDown(index, false)}
                 onMouseMove={() => handleMouseMove(index)}
-                onClick={(e) => handleSquareClick(index, e, false)} // Передаем событие в функцию
+                onClick={(e) => {
+                  if (isFilling) {
+                    floodFill(index);
+                    setIsFilling(false);
+                  } else {
+                    handleSquareClick(index, e, false);
+                  }
+                }}
               />
             ))}
           </div>
 
-          {/* Отображение активного цвета */}
           <div className="mt-4">
             <h3 className="text-secondary mb-2">Active Color</h3>
-            <div
-              className="w-[46px] h-[46px] border"
-              style={{
-                backgroundColor: currentColor,
-              }}
-            />
+            <div className="w-[46px] h-[46px] border" style={{ backgroundColor: currentColor }} />
           </div>
 
           <div className="mt-4">
@@ -421,7 +460,7 @@ const CreateArt = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div ref={modalRef} className=" bg-areasBg p-6 rounded-lg shadow-lg max-w-3xl w-full">
+          <div ref={modalRef} className="bg-areasBg p-6 rounded-lg shadow-lg max-w-3xl w-full">
             <h2 className="text-2xl font-bold text-secondaryDarker mb-4">Palettes</h2>
             <div className="flex justify-center mb-4">
               <input
