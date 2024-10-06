@@ -16,12 +16,15 @@ const Home = () => {
   const [likesUsers, setLikesUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false); // Модальное окно для выбора Create Art / Palette
   const [paletteModalOpen, setPaletteModalOpen] = useState(false); // Модальное окно для отображения палитры
+  const [artModalOpen, setArtModalOpen] = useState(false); // Модальное окно для отображения арта
   const [selectedPalette, setSelectedPalette] = useState(null); // Текущая выбранная палитра
+  const [selectedArt, setSelectedArt] = useState(null); // Текущий выбранный арт
   const [searchQuery, setSearchQuery] = useState('');
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
   const createModalRef = useRef(null);
   const paletteModalRef = useRef(null);
+  const artModalRef = useRef(null);
   const likesModalRef = useRef(null);
   const navigate = useNavigate();
 
@@ -77,6 +80,19 @@ const Home = () => {
       document.removeEventListener('mousedown', handleClickOutsidePalette);
     };
   }, [paletteModalOpen, likesModalOpen]);
+
+  // Закрытие окна арта при клике вне
+  useEffect(() => {
+    const handleClickOutsideArt = (event) => {
+      if (artModalOpen && artModalRef.current && !artModalRef.current.contains(event.target)) {
+        setArtModalOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutsideArt);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideArt);
+    };
+  }, [artModalOpen]);
 
   // Закрытие окна лайков при клике вне
   useEffect(() => {
@@ -143,6 +159,13 @@ const Home = () => {
     setSelectedPalette(palette);
     setPaletteModalOpen(true);
   };
+
+  const handleOpenArtModal = (art) => {
+    setSelectedArt(art);
+    setArtModalOpen(true);
+  };
+
+  const artWidth = publicPalettes.length > 0 ? publicPalettes[0].colors.length * 32 * 2 : 0; // Установка ширины артов (умножаем на 2 для увеличения)
 
   return (
     <div className="min-h-screen bg-primary">
@@ -212,7 +235,6 @@ const Home = () => {
 
           {activeCategory === 'palettes' && (
             <>
-              <h2 className="text-2xl font-bold text-secondary mb-4 text-center">Public Palettes</h2>
               <div className="flex justify-center">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
                   {filterItemsByName(publicPalettes).length > 0 ? (
@@ -221,6 +243,7 @@ const Home = () => {
                       .map((palette, index) => (
                         <div
                           key={index}
+                          className="hover:opacity-75"
                           style={{ width: 'fit-content', cursor: 'pointer' }}
                           onClick={() => handleOpenPaletteModal(palette)}
                         >
@@ -241,31 +264,19 @@ const Home = () => {
 
           {activeCategory === 'arts' && (
             <>
-              <h2 className="text-2xl font-bold text-secondary mb-4 text-center">Public Arts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-3" style={{ justifyItems: 'center' }}>
                 {filterItemsByName(publicArts).length > 0 ? (
                   filterItemsByName(publicArts)
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                     .map((art, index) => (
-                      <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg">
-                        <h3 className="text-lg font-bold mb-2 text-secondary">{art.name}</h3>
-                        <p className="text-sm text-secondary mb-2">
-                          by{' '}
-                          {art.user?.username ? (
-                            <Link to={`/users/${art.user.username}`} className="underline">
-                              {art.user.username}
-                            </Link>
-                          ) : (
-                            'Unknown'
-                          )}
-                        </p>
+                      <div key={index} onClick={() => handleOpenArtModal(art)} style={{ cursor: 'pointer' }}>
                         <div
-                          className="grid"
+                          className="grid hover:opacity-75"
                           style={{
                             gridTemplateColumns: `repeat(${art.width}, 1fr)`,
                             gap: '0px',
-                            width: `${art.width * 20}px`,
-                            height: `${art.height * 20}px`,
+                            width: `${artWidth}px`, // Установка ширины арта
+                            height: `${art.height * (artWidth / art.width)}px`, // Подстраивание высоты
                           }}
                         >
                           {art.pixels.map((color, idx) => (
@@ -292,9 +303,9 @@ const Home = () => {
 
       {paletteModalOpen && selectedPalette && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div ref={paletteModalRef} className="bg-areasBg p-6 rounded-lg shadow-lg max-w-lg w-full text-center">
+          <div ref={paletteModalRef} className="bg-areasBg p-6 rounded-lg shadow-lg text-center">
             <h2 className="text-2xl text-secondary font-bold mb-4">{selectedPalette.name}</h2>
-            <div className="grid grid-cols-4 gap-0 mb-4" style={{ width: 'fit-content' }}>
+            <div className="grid grid-cols-4 gap-0 mb-4">
               {selectedPalette.colors.map((color, idx) => (
                 <div key={idx} className="w-32 h-32" style={{ backgroundColor: color }} />
               ))}
@@ -306,11 +317,11 @@ const Home = () => {
             </div>
             <p className="text-sm text-secondary mb-2">
               by{' '}
-                {selectedPalette.user?.username ? (
-                  <Link to={`/users/${selectedPalette.user.username}`} className="underline">
-                    {selectedPalette.user.username}
-                  </Link>
-                ) : (
+              {selectedPalette.user?.username ? (
+                <Link to={`/users/${selectedPalette.user.username}`} className="underline">
+                  {selectedPalette.user.username}
+                </Link>
+              ) : (
                 'Unknown'
               )}
             </p>
@@ -333,6 +344,44 @@ const Home = () => {
                 {selectedPalette.likes === 1 ? `${selectedPalette.likes} like` : `${selectedPalette.likes} likes`}
               </span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {artModalOpen && selectedArt && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div ref={artModalRef} className="bg-areasBg p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl text-secondary font-bold mb-4">{selectedArt.name}</h2>
+            <div
+              className="grid"
+              style={{
+                gridTemplateColumns: `repeat(${selectedArt.width}, 1fr)`,
+                gap: '0px',
+                width: `${artWidth}px`, // Установка ширины арта
+                height: `${selectedArt.height * (artWidth / selectedArt.width)}px`, // Подстраивание высоты
+              }}
+            >
+              {selectedArt.pixels.map((color, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    backgroundColor: color,
+                    width: '100%',
+                    height: '100%',
+                  }}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-secondary mb-4" style={{ marginTop: '1rem' }}>
+              by{' '}
+              {selectedArt.user?.username ? (
+                <Link to={`/users/${selectedArt.user.username}`} className="underline">
+                  {selectedArt.user.username}
+                </Link>
+              ) : (
+                'Unknown'
+              )}
+            </p>
           </div>
         </div>
       )}

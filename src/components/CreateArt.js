@@ -22,7 +22,10 @@ const CreateArt = () => {
 
   const [isDrawing, setIsDrawing] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [undoStack, setUndoStack] = useState([]); // Для отмены
+  const [redoStack, setRedoStack] = useState([]); // Для повтора
+
+  const [isModalOpen, setIsModalOpen] = useState(false); // Для открытия окна палитр
   const [userPalettes, setUserPalettes] = useState([]);
   const [likedPalettes, setLikedPalettes] = useState([]);
   const [allPalettes, setAllPalettes] = useState([]);
@@ -68,8 +71,13 @@ const CreateArt = () => {
     };
   }, []);
 
+  const saveStateForUndo = () => {
+    setUndoStack([...undoStack, pixels]); // Сохраняем текущее состояние в стек отмены
+    setRedoStack([]); // Сбрасываем стек повтора при каждом изменении
+  };
+
   const handleColorChange = (color) => {
-    setCurrentColor(color.hex);
+    setCurrentColor(color.hex); // Обновляем активный цвет
     if (selectedPixel !== null) {
       if (selectedPixel < palette.length) {
         const newPalette = [...palette];
@@ -77,14 +85,16 @@ const CreateArt = () => {
         setPalette(newPalette);
       } else {
         const newPixels = [...pixels];
-        newPixels[selectedPixel - palette.length] = color.hex;
+        newPixels[selectedPixel - palette.length] = color.hex; // Окрашиваем квадрат на рисунке
         setPixels(newPixels);
       }
     }
   };
 
   const handleSquareClick = (index, event, isPalette) => {
+    saveStateForUndo(); // Сохраняем состояние перед изменением
     if (isPalette) {
+      // Логика для палитры
       if (activePaletteIndex === index) {
         setActivePaletteIndex(null);
         setCurrentColor('#000000');
@@ -102,25 +112,21 @@ const CreateArt = () => {
         left: rect.left + window.scrollX,
       });
     } else {
-      if (activePaletteIndex === null) {
-        setSelectedPixel(index + palette.length);
-        setPickerVisible(true);
-
-        const rect = event.target.getBoundingClientRect();
-        setPosition({
-          top: rect.top + window.scrollY + rect.height,
-          left: rect.left + window.scrollX,
-        });
-      } else {
-        const newPixels = [...pixels];
-        newPixels[index] = currentColor;
-        setPixels(newPixels);
-      }
+      // Логика для рисунка
+      setSelectedPixel(index + palette.length); // Устанавливаем выбранный пиксель
+      setPickerVisible(true); // Открываем цветовое колесо
+      const rect = event.target.getBoundingClientRect();
+      setPosition({
+        top: rect.top + window.scrollY + rect.height,
+        left: rect.left + window.scrollX,
+      });
     }
   };
 
   const handleMouseDown = (index, isPalette) => {
-    if (!isPalette && activePaletteIndex !== null) {
+    saveStateForUndo(); // Сохраняем состояние перед началом рисования
+
+    if (!isPalette) {
       const newPixels = [...pixels];
       newPixels[index] = currentColor;
       setPixels(newPixels);
@@ -140,16 +146,58 @@ const CreateArt = () => {
     setIsDrawing(false);
   };
 
+  const handleUndo = () => {
+    if (undoStack.length > 0) {
+      const previousState = undoStack.pop();
+      setRedoStack([...redoStack, pixels]); // Сохраняем текущее состояние в стек повтора
+      setPixels(previousState);
+      setUndoStack([...undoStack]);
+    }
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length > 0) {
+      const nextState = redoStack.pop();
+      setUndoStack([...undoStack, pixels]); // Сохраняем текущее состояние в стек отмены
+      setPixels(nextState);
+      setRedoStack([...redoStack]);
+    }
+  };
+
   const handleWidthChange = (e) => {
     const newWidth = Math.max(2, Math.min(32, Number(e.target.value)));
+    const newPixels = Array(newWidth * height).fill('#ffffff');
+
+    // Копируем старые цвета в новую структуру, если это возможно
+    for (let i = 0; i < height; i++) {
+      for (let j = 0; j < newWidth; j++) {
+        const oldIndex = i * width + j;
+        if (oldIndex < pixels.length) {
+          newPixels[i * newWidth + j] = pixels[oldIndex];
+        }
+      }
+    }
+
     setWidth(newWidth);
-    setPixels(Array(newWidth * height).fill('#ffffff'));
+    setPixels(newPixels);
   };
 
   const handleHeightChange = (e) => {
     const newHeight = Math.max(2, Math.min(32, Number(e.target.value)));
+    const newPixels = Array(width * newHeight).fill('#ffffff');
+
+    // Копируем старые цвета в новую структуру, если это возможно
+    for (let i = 0; i < newHeight; i++) {
+      for (let j = 0; j < width; j++) {
+        const oldIndex = i < height ? i * width + j : null; // Избегаем доступа вне диапазона
+        if (oldIndex !== null && oldIndex < pixels.length) {
+          newPixels[i * width + j] = pixels[oldIndex];
+        }
+      }
+    }
+
     setHeight(newHeight);
-    setPixels(Array(width * newHeight).fill('#ffffff'));
+    setPixels(newPixels);
   };
 
   const addPaletteSquare = () => {
@@ -207,7 +255,6 @@ const CreateArt = () => {
     setIsModalOpen(false);
   };
 
-
   const filterPalettesByName = (palettes) => {
     return palettes.filter((palette) =>
       palette.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -257,7 +304,7 @@ const CreateArt = () => {
               ...
             </button>
           </div>
-          <div className="grid" style={{ gridTemplateColumns: `repeat(${paletteWidth}, 1fr)`}}>
+          <div className="grid" style={{ gridTemplateColumns: `repeat(${paletteWidth}, 1fr)` }}>
             {palette.map((color, index) => (
               <div
                 key={index}
@@ -265,7 +312,7 @@ const CreateArt = () => {
                   activePaletteIndex === index ? 'border-4 border-yellow-500' : ''
                 }`}
                 style={{ backgroundColor: color }}
-                onClick={(e) => handleSquareClick(index, e, true)}
+                onClick={(e) => handleSquareClick(index, e, true)} // Передаем событие в функцию
               />
             ))}
           </div>
@@ -311,7 +358,7 @@ const CreateArt = () => {
             </div>
           </div>
 
-          <div className="grid" style={{ gridTemplateColumns: `repeat(${width}, 1fr)`}} onMouseUp={handleMouseUp}>
+          <div className="grid" style={{ gridTemplateColumns: `repeat(${width}, 1fr)` }} onMouseUp={handleMouseUp}>
             {pixels.map((color, index) => (
               <div
                 key={index}
@@ -323,9 +370,37 @@ const CreateArt = () => {
                 }}
                 onMouseDown={() => handleMouseDown(index, false)}
                 onMouseMove={() => handleMouseMove(index)}
-                onClick={(e) => handleSquareClick(index, e, false)}
+                onClick={(e) => handleSquareClick(index, e, false)} // Передаем событие в функцию
               />
             ))}
+          </div>
+
+          {/* Отображение активного цвета */}
+          <div className="mt-4">
+            <h3 className="text-secondary mb-2">Active Color</h3>
+            <div
+              className="w-[46px] h-[46px] border"
+              style={{
+                backgroundColor: currentColor,
+              }}
+            />
+          </div>
+
+          <div className="mt-4">
+            <button
+              onClick={handleUndo}
+              className="px-4 py-2 bg-secondary text-primary rounded mr-4 hover:bg-secondaryDarker"
+              disabled={undoStack.length === 0}
+            >
+              Undo
+            </button>
+            <button
+              onClick={handleRedo}
+              className="px-4 py-2 bg-secondary text-primary rounded hover:bg-secondaryDarker"
+              disabled={redoStack.length === 0}
+            >
+              Redo
+            </button>
           </div>
         </div>
       </div>
@@ -462,7 +537,7 @@ const CreateArt = () => {
             </div>
 
             <div className="flex justify-end space-x-4">
-              <button onClick={closeModal} className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary hover:text-primary">
+              <button onClick={() => setIsSaveModalOpen(false)} className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary hover:text-primary">
                 Cancel
               </button>
               <button onClick={handleSaveArtAsFinal} className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary hover:text-primary">
