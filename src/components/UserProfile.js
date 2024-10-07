@@ -160,9 +160,7 @@ const UserProfile = () => {
                           <span
                             className="text-secondary text-xs"
                             onClick={() => {
-                              if (currentUser === username) {
-                                handleShowLikes(palette.id);
-                              }
+                              handleShowLikes(palette.id);
                             }}
                             style={{ cursor: currentUser === username ? 'pointer' : 'default' }}
                           >
