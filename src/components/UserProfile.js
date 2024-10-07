@@ -34,7 +34,7 @@ const UserProfile = () => {
       .catch(error => console.error('Error fetching public palettes:', error));
 
     if (loggedInUser) {
-      axios.get(`${API_BASE_URL}/palettes/user/${loggedInUser}/likes`, { withCredentials: true })
+      axios.get(`${API_BASE_URL}/palettes/user/${username}/likes`, { withCredentials: true })
         .then(response => setLikedPalettes(response.data))
         .catch(error => console.error('Error fetching liked palettes:', error));
     }
@@ -136,8 +136,7 @@ const UserProfile = () => {
                   {palettes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((palette, index) => (
                     <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg">
                       <h3 className="text-lg font-bold mb-2 text-secondary">{palette.name}</h3>
-                      <p className="text-sm text-secondary mb-4">by <Link to={`/users/${palette.user.username}`} className="underline">{palette.user.username}</Link></p>
-                      <div className="grid grid-cols-4" style={{ gap: '0px' }}>
+                      <div className="grid grid-cols-4" style={{ gap: '0px', gridTemplateColumns: 'repeat(4, fit-content(100%))' }}>
                         {palette.colors.map((color, idx) => (
                           <div
                             key={idx}
@@ -189,8 +188,16 @@ const UserProfile = () => {
                   {likedPalettes.sort((a, b) => new Date(b.likedAt) - new Date(a.likedAt)).map((palette, index) => (
                     <div key={index} className="p-4 rounded-lg shadow-md bg-areasBg">
                       <h3 className="text-lg font-bold mb-2 text-secondary">{palette.name}</h3>
-                      <p className="text-sm text-secondary mb-4">by <Link to={`/users/${palette.user.username}`} className="underline">{palette.user.username}</Link></p>
-                      <div className="grid grid-cols-4" style={{ gap: '0px' }}>
+                      <p className="text-sm text-secondary mb-4">
+                        by {palette.user ? (
+                          <Link to={`/users/${palette.user.username}`} className="underline">
+                            {palette.user.username}
+                          </Link>
+                        ) : (
+                          'Unknown'
+                        )}
+                      </p>
+                      <div className="grid grid-cols-4" style={{ gap: '0px', gridTemplateColumns: 'repeat(4, fit-content(100%))' }}>
                         {palette.colors.map((color, idx) => (
                           <div
                             key={idx}

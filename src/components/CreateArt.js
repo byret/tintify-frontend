@@ -6,7 +6,7 @@ import Navbar from './common/Navbar';
 const CreateArt = () => {
   const [width, setWidth] = useState(10);
   const [height, setHeight] = useState(10);
-  const [pixelSize, setPixelSize] = useState(46);
+  const [pixelSize, setPixelSize] = useState(45);
   const [pixels, setPixels] = useState(Array(width * height).fill('#ffffff'));
 
   const [palette, setPalette] = useState(Array(3 * 3).fill('#ffffff'));
@@ -22,6 +22,7 @@ const CreateArt = () => {
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [isFilling, setIsFilling] = useState(false);
+  const [isPicking, setIsPicking] = useState(false);
 
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
@@ -35,6 +36,7 @@ const CreateArt = () => {
 
   const [artName, setArtName] = useState('');
   const [isPublic, setIsPublic] = useState(false);
+  const [isDownloadable, setIsDownloadable] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isCheckboxDisabled, setIsCheckboxDisabled] = useState(false);
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
@@ -42,6 +44,7 @@ const CreateArt = () => {
   const pickerRef = useRef(null);
   const modalRef = useRef(null);
   const saveModalRef = useRef(null);
+  const canvasRef = useRef(null);
 
   const isAuthenticated = sessionStorage.getItem('authToken') ? true : false;
 
@@ -72,6 +75,28 @@ const CreateArt = () => {
     };
   }, []);
 
+   const handleDownloadImage = () => {
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+
+      canvas.width = width * pixelSize;
+      canvas.height = height * pixelSize;
+
+      pixels.forEach((color, index) => {
+        const row = Math.floor(index / width);
+        const col = index % width;
+        context.fillStyle = color;
+        context.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+      });
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      const fileName = artName.trim() !== '' ? `${artName}.png` : 'pixel-art.png';
+      link.download = fileName;
+      link.click();
+    };
+
+
   const saveStateForUndo = () => {
     setUndoStack([...undoStack, pixels]);
     setRedoStack([]);
@@ -93,40 +118,44 @@ const CreateArt = () => {
   };
 
   const handleSquareClick = (index, event, isPalette) => {
-    saveStateForUndo();
-    if (isPalette) {
-      if (activePaletteIndex === index) {
-        setActivePaletteIndex(null);
-        setCurrentColor('#000000');
-      } else {
-        setSelectedPixel(index);
-        setActivePaletteIndex(index);
-        setCurrentColor(palette[index]);
-      }
-
-      setPickerVisible(true);
-
-      const rect = event.target.getBoundingClientRect();
-      setPosition({
-        top: rect.top + window.scrollY + rect.height,
-        left: rect.left + window.scrollX,
-      });
+    if (isPicking) {
+      setCurrentColor(pixels[index]);
+      setIsPicking(false);
     } else {
-      // Логика для рисунка
-      setSelectedPixel(index + palette.length);
-      setPickerVisible(true);
-      const rect = event.target.getBoundingClientRect();
-      setPosition({
-        top: rect.top + window.scrollY + rect.height,
-        left: rect.left + window.scrollX,
-      });
+      saveStateForUndo();
+      if (isPalette) {
+        if (activePaletteIndex === index) {
+          setActivePaletteIndex(null);
+          setCurrentColor('#000000');
+        } else {
+          setSelectedPixel(index);
+          setActivePaletteIndex(index);
+          setCurrentColor(palette[index]);
+        }
+
+        setPickerVisible(true);
+
+        const rect = event.target.getBoundingClientRect();
+        setPosition({
+          top: rect.top + window.scrollY + rect.height,
+          left: rect.left + window.scrollX,
+        });
+      } else {
+        setSelectedPixel(index + palette.length);
+        setPickerVisible(true);
+        const rect = event.target.getBoundingClientRect();
+        setPosition({
+          top: rect.top + window.scrollY + rect.height,
+          left: rect.left + window.scrollX,
+        });
+      }
     }
   };
 
   const handleMouseDown = (index, isPalette) => {
     saveStateForUndo();
 
-    if (!isPalette) {
+    if (!isPalette && !isFilling && !isPicking) {
       const newPixels = [...pixels];
       newPixels[index] = currentColor;
       setPixels(newPixels);
@@ -265,42 +294,51 @@ const CreateArt = () => {
   };
 
   const handleSaveArtAsFinal = () => {
-    const artData = {
-      name: artName,
-      isPublic,
-      pixels,
-      width,
-      height,
-    };
+     const canvas = canvasRef.current;
+     const artBase64 = canvas.toDataURL('image/png');
 
-    axios
-      .post(`${API_BASE_URL}/arts/create`, artData, { withCredentials: true })
-      .then((response) => {
-        setIsSaveModalOpen(false);
-      })
-      .catch((error) => console.error('Error saving art:', error));
-  };
+     const artData = {
+       name: artName,
+       isPublic,
+       isDownloadable,
+       pixels,
+       width,
+       height,
+       pixelSize,
+       imageData: artBase64,
+     };
+
+     axios
+       .post(`${API_BASE_URL}/arts/create`, artData, { withCredentials: true })
+       .then((response) => {
+         setIsSaveModalOpen(false);
+         console.log('Art saved successfully');
+       })
+       .catch((error) => {
+         console.error('Error saving art:', error);
+       });
+   };
 
   const floodFill = (index) => {
     const targetColor = pixels[index];
-    const newPixels = [...pixels];
-
     if (targetColor === currentColor) return;
 
+    const newPixels = [...pixels];
     const stack = [index];
 
-    while (stack.length) {
+    while (stack.length > 0) {
       const currentIndex = stack.pop();
-      if (newPixels[currentIndex] !== targetColor) continue;
 
-      newPixels[currentIndex] = currentColor;
+      if (newPixels[currentIndex] === targetColor) {
+        newPixels[currentIndex] = currentColor;
 
-      const neighbors = getNeighbors(currentIndex);
-      neighbors.forEach((neighbor) => {
-        if (newPixels[neighbor] === targetColor) {
-          stack.push(neighbor);
-        }
-      });
+        const neighbors = getNeighbors(currentIndex);
+        neighbors.forEach((neighbor) => {
+          if (newPixels[neighbor] === targetColor) {
+            stack.push(neighbor);
+          }
+        });
+      }
     }
 
     setPixels(newPixels);
@@ -320,143 +358,127 @@ const CreateArt = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary pt-16">
-      <Navbar showSaveButton={true} onSaveClick={handleSaveClick} />
+      <div className="min-h-screen bg-primary pt-16">
+        <Navbar showSaveButton={true} onSaveClick={handleSaveClick} />
 
-      <div className="container mx-auto py-8 text-center flex justify-center space-x-16">
-        <div className="flex flex-col items-start" style={{ transform: 'translateX(-70%)' }}>
-          <h2 className="text-secondary text-xl mb-4">Palette</h2>
-          <div className="flex mb-8 space-x-2">
-            <button onClick={addPaletteSquare} className="bg-secondary text-primary w-10 h-10 border rounded">
-              +
-            </button>
-            <button onClick={removePaletteSquare} className="bg-secondary text-primary w-10 h-10 border rounded">
-              -
-            </button>
-            <button onClick={openModal} className="bg-secondary text-primary w-10 h-10 border rounded">
-              ...
-            </button>
+        <div className="container mx-auto py-8 flex justify-center items-start space-x-16">
+          {/* Палитра слева */}
+          <div className="flex flex-col items-center" style={{ marginRight: '50px' }}>
+            <h2 className="text-secondary text-xl mb-4">Palette</h2>
+            <div className="flex mb-8 space-x-2">
+              <button onClick={addPaletteSquare} className="bg-secondary text-primary w-10 h-10 border rounded">+</button>
+              <button onClick={removePaletteSquare} className="bg-secondary text-primary w-10 h-10 border rounded">-</button>
+              <button onClick={openModal} className="bg-secondary text-primary w-10 h-10 border rounded">...</button>
+            </div>
+            <div className="grid" style={{ gridTemplateColumns: `repeat(${paletteWidth}, 1fr)` }}>
+              {palette.map((color, index) => (
+                <div
+                  key={index}
+                  className={`w-[46px] h-[46px] cursor-pointer border ${activePaletteIndex === index ? 'border-4 border-yellow-500' : ''}`}
+                  style={{ backgroundColor: color }}
+                  onClick={(e) => handleSquareClick(index, e, true)} // Передаем событие в функцию
+                />
+              ))}
+            </div>
           </div>
-          <div className="grid" style={{ gridTemplateColumns: `repeat(${paletteWidth}, 1fr)` }}>
-            {palette.map((color, index) => (
-              <div
-                key={index}
-                className={`w-[46px] h-[46px] cursor-pointer border ${activePaletteIndex === index ? 'border-4 border-yellow-500' : ''}`}
-                style={{ backgroundColor: color }}
-                onClick={(e) => handleSquareClick(index, e, true)} // Передаем событие в функцию
-              />
-            ))}
-          </div>
-        </div>
 
-        <div className="flex flex-col items-center mx-auto" style={{ transform: 'translateX(-20%)' }}>
-          <h2 className="text-secondary text-xl mb-4">Pixel Art</h2>
-          <div className="flex justify-center mb-8 space-x-4">
-            <div>
-              <label className="text-secondary mr-2">Width:</label>
-              <input
-                type="number"
-                value={width}
-                onChange={handleWidthChange}
-                min="2"
-                max="32"
-                className="px-2 py-1 rounded text-black"
-              />
+          <div className="flex flex-col items-center">
+            <h2 className="text-secondary text-xl mb-4">Pixel Art</h2>
+            <div className="flex justify-center mb-8 space-x-4">
+              <div>
+                <label className="text-secondary mr-2">Width:</label>
+                <input type="number" value={width} onChange={handleWidthChange} min="2" max="32" className="px-2 py-1 rounded text-black" />
+              </div>
+
+              <div>
+                <label className="text-secondary mr-2">Height:</label>
+                <input type="number" value={height} onChange={handleHeightChange} min="2" max="32" className="px-2 py-1 rounded text-black" />
+              </div>
+
+              <div>
+                <label className="text-secondary mr-2">Pixel Size:</label>
+                <input type="number" value={pixelSize} onChange={handlePixelSizeChange} min="4" max="64" className="px-2 py-1 rounded text-black" />
+              </div>
             </div>
 
-            <div>
-              <label className="text-secondary mr-2">Height:</label>
-              <input
-                type="number"
-                value={height}
-                onChange={handleHeightChange}
-                min="2"
-                max="32"
-                className="px-2 py-1 rounded text-black"
-              />
+            <div className="flex justify-center mt-8">
+              <div className="grid" style={{ gridTemplateColumns: `repeat(${width}, 1fr)` }} onMouseUp={handleMouseUp}>
+                {pixels.map((color, index) => (
+                  <div
+                    key={index}
+                    className="cursor-pointer border"
+                    style={{
+                      backgroundColor: color,
+                      width: `${pixelSize}px`,
+                      height: `${pixelSize}px`,
+                    }}
+                    onMouseDown={() => handleMouseDown(index, false)}
+                    onMouseMove={() => handleMouseMove(index)}
+                    onClick={(e) => {
+                      if (isFilling) {
+                        floodFill(index);
+                        setIsFilling(false);
+                      } else {
+                        handleSquareClick(index, e, false);
+                      }
+                    }}
+                  />
+                ))}
+              </div>
             </div>
+          </div>
 
-            <div>
-              <label className="text-secondary mr-2">Pixel Size:</label>
-              <input
-                type="number"
-                value={pixelSize}
-                onChange={handlePixelSizeChange}
-                min="4"
-                max="64"
-                className="px-2 py-1 rounded text-black"
-              />
+          <div className="flex flex-col items-center" style={{ marginLeft: '50px' }}>
+            <div className="flex items-center space-x-2 mb-4">
+              <h3 className="text-secondary">Active Colour:</h3>
+              <div className="w-12 h-12 border" style={{ backgroundColor: currentColor }} />
             </div>
 
             <button
-              onClick={() => setIsFilling(true)}
-              className="bg-secondary text-primary w-10 h-10 border rounded"
+              onClick={() => setIsFilling(!isFilling)}
+              className={`w-24 h-12 border rounded ${isFilling ? 'bg-green-500 text-white' : 'bg-secondary text-primary'} mb-2`}
             >
               Fill
             </button>
-          </div>
 
-          <div className="grid" style={{ gridTemplateColumns: `repeat(${width}, 1fr)` }} onMouseUp={handleMouseUp}>
-            {pixels.map((color, index) => (
-              <div
-                key={index}
-                className="cursor-pointer border"
-                style={{
-                  backgroundColor: color,
-                  width: `${pixelSize}px`,
-                  height: `${pixelSize}px`,
-                }}
-                onMouseDown={() => handleMouseDown(index, false)}
-                onMouseMove={() => handleMouseMove(index)}
-                onClick={(e) => {
-                  if (isFilling) {
-                    floodFill(index);
-                    setIsFilling(false);
-                  } else {
-                    handleSquareClick(index, e, false);
-                  }
-                }}
-              />
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <h3 className="text-secondary mb-2">Active Color</h3>
-            <div className="w-[46px] h-[46px] border" style={{ backgroundColor: currentColor }} />
-          </div>
-
-          <div className="mt-4">
             <button
               onClick={handleUndo}
-              className="px-4 py-2 bg-secondary text-primary rounded mr-4 hover:bg-secondaryDarker"
+              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2"
               disabled={undoStack.length === 0}
             >
               Undo
             </button>
+
             <button
               onClick={handleRedo}
-              className="px-4 py-2 bg-secondary text-primary rounded hover:bg-secondaryDarker"
+              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2"
               disabled={redoStack.length === 0}
             >
               Redo
             </button>
+
+            <button
+              onClick={() => setIsPicking(!isPicking)}
+              className={`w-24 h-12 border rounded ${isPicking ? 'bg-blue-500 text-white' : 'bg-secondary text-primary'} mb-2`}
+            >
+              Pipette
+            </button>
           </div>
         </div>
-      </div>
 
-      {pickerVisible && (
-        <div
-          ref={pickerRef}
-          style={{
-            position: 'absolute',
-            top: `${position.top}px`,
-            left: `${position.left}px`,
-            zIndex: 1000,
-          }}
-        >
-          <ChromePicker color={currentColor} onChangeComplete={handleColorChange} />
-        </div>
-      )}
+        {pickerVisible && (
+          <div
+            ref={pickerRef}
+            style={{
+              position: 'absolute',
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+              zIndex: 1000,
+            }}
+          >
+            <ChromePicker color={currentColor} onChangeComplete={handleColorChange} />
+          </div>
+        )}5
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -575,10 +597,22 @@ const CreateArt = () => {
               </label>
             </div>
 
-            <div className="flex justify-end space-x-4">
-              <button onClick={() => setIsSaveModalOpen(false)} className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary hover:text-primary">
-                Cancel
-              </button>
+            <div className="mb-4">
+              <label className="inline-flex items-center text-secondaryDarker">
+                <input
+                  type="checkbox"
+                  checked={isDownloadable}
+                  onChange={() => setIsDownloadable(!isDownloadable)}
+                  className="mr-2"
+                />
+                Allow to download
+              </label>
+            </div>
+
+            <div className="flex justify-center space-x-4">
+              <button className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary hover:text-primary" onClick={handleDownloadImage}>Download as PNG</button>
+              <canvas ref={canvasRef} style={{ display: 'none' }} />
+
               <button onClick={handleSaveArtAsFinal} className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary hover:text-primary">
                 Save art
               </button>

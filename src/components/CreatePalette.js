@@ -112,7 +112,7 @@ const CreatePalette = () => {
         <h1 className="text-center text-secondary text-3xl font-bold mb-6">Create your palette</h1>
 
         <div className="flex justify-center mb-6">
-          <label className="text-secondary mr-4">Choose a color scheme:</label>
+          <label className="text-secondary mr-4">Choose a colour scheme:</label>
           <select
             value={selectedScheme}
             onChange={handleSchemeChange}
@@ -130,7 +130,7 @@ const CreatePalette = () => {
         </div>
 
         <div className="flex justify-center mb-6">
-          <label className="text-secondary mr-4">Number of colors:</label>
+          <label className="text-secondary mr-4">Number of colours:</label>
           <input
             type="number"
             value={squareCount}

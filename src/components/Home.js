@@ -68,6 +68,20 @@ const Home = () => {
       .catch(error => console.error('Error fetching users who liked the item:', error));
   };
 
+  // Закрытие окна Create при клике вне него
+  useEffect(() => {
+    const handleClickOutsideCreate = (event) => {
+      if (isModalOpen && createModalRef.current && !createModalRef.current.contains(event.target)) {
+        setIsModalOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutsideCreate);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideCreate);
+    };
+  }, [isModalOpen]);
+
+  // Закрытие окна палитры при клике вне
   useEffect(() => {
     const handleClickOutsidePalette = (event) => {
       if (paletteModalOpen && paletteModalRef.current && !paletteModalRef.current.contains(event.target) && !likesModalOpen) {
@@ -80,6 +94,7 @@ const Home = () => {
     };
   }, [paletteModalOpen, likesModalOpen]);
 
+  // Закрытие окна артов при клике вне
   useEffect(() => {
     const handleClickOutsideArt = (event) => {
       if (artModalOpen && artModalRef.current && !artModalRef.current.contains(event.target)) {
@@ -92,6 +107,7 @@ const Home = () => {
     };
   }, [artModalOpen]);
 
+  // Закрытие окна лайков при клике вне
   useEffect(() => {
     const handleClickOutsideLikes = (event) => {
       if (likesModalOpen && likesModalRef.current && !likesModalRef.current.contains(event.target)) {
@@ -164,6 +180,28 @@ const Home = () => {
 
   const artWidth = publicPalettes.length > 0 ? publicPalettes[0].colors.length * 32 * 2 : 0; // Установка ширины артов (умножаем на 2 для увеличения)
 
+  const handleDownloadArtAsPng = (art) => {
+    const pixelSize = selectedArt.pixelSize;
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    canvas.width = selectedArt.width * pixelSize;
+    canvas.height = selectedArt.height * pixelSize;
+
+    selectedArt.pixels.forEach((color, index) => {
+      const row = Math.floor(index / selectedArt.width);
+      const col = index % selectedArt.width;
+      context.fillStyle = color;
+      context.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+    });
+
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = `${selectedArt.name || 'art'}.png`;
+    link.click();
+  };
+
   return (
     <div className="min-h-screen bg-primary">
       <Navbar
@@ -194,9 +232,6 @@ const Home = () => {
                 className="bg-primary text-secondary py-2 px-4 rounded hover:text-primary hover:bg-secondary transition-all w-full"
               >
                 Create Palette
-              </button>
-              <button onClick={closeCreateModal} className="mt-4 text-gray-500 hover:text-black">
-                Cancel
               </button>
             </div>
           </div>
@@ -369,6 +404,14 @@ const Home = () => {
                 />
               ))}
             </div>
+            {selectedArt.isDownloadable && (
+             <button
+                    onClick={handleDownloadArtAsPng}
+                    className="bg-primary text-secondary py-2 px-4 rounded mt-4 hover:text-primary hover:bg-secondary transition-all"
+                  >
+                    Download as PNG
+             </button>
+             )}
             <p className="text-sm text-secondary mb-4" style={{ marginTop: '1rem' }}>
               by{' '}
               {selectedArt.user?.username ? (

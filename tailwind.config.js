@@ -16,7 +16,7 @@ module.exports = {
         blocked: '#bfbfbe'
       },
       fontFamily: {
-        sans: ['nokiafc22', 'Arial', 'sans-serif'],
+        sans: ['pixpopenei', 'Arial', 'sans-serif'],
       },
     },
   },

@@ -15,12 +15,12 @@ code {
 @tailwind components;
 @tailwind utilities;
 @font-face {
-  font-family: 'nokiafc22';
-  src: url('./assets/fonts/nokiafc22.ttf') format('truetype');
+  font-family: 'pixpopenei';
+  src: url('./assets/fonts/pixpopenei.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
 body {
-  font-family: 'nokiafc22', Arial, sans-serif;
+  font-family: 'pixpopenei', Arial, sans-serif;
 }
