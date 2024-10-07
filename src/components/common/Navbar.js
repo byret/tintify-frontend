@@ -24,7 +24,6 @@ const Navbar = ({
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Проверка, нужно ли отображать гамбургер-меню (скрываем его на страницах логина и регистрации)
   const hideHamburger = location.pathname === '/login' || location.pathname === '/register';
 
   return (
@@ -39,7 +38,6 @@ const Navbar = ({
           </Link>
         </div>
 
-        {/* Показываем гамбургер-меню только на нужных страницах */}
         {!hideHamburger && (
           <div className="md:hidden">
             <button onClick={toggleMobileMenu} className="text-white">
