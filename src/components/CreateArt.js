@@ -330,6 +330,22 @@ const CreateArt = () => {
        });
    };
 
+   const toggleTool = (tool) => {
+     if (tool === 'fill') {
+       setIsFilling(!isFilling);
+       setIsErasing(false);
+       setIsPicking(false);
+     } else if (tool === 'pick') {
+       setIsPicking(!isPicking);
+       setIsFilling(false);
+       setIsErasing(false);
+     } else if (tool === 'erase') {
+       setIsErasing(!isErasing);
+       setIsFilling(false);
+       setIsPicking(false);
+     }
+   };
+
   const floodFill = (index) => {
     const targetColor = pixels[index];
     if (targetColor === currentColor) return;
@@ -464,7 +480,7 @@ const CreateArt = () => {
             </div>
 
             <button
-              onClick={() => setIsFilling(!isFilling)}
+              onClick={() => toggleTool('fill')}
               className={`w-24 h-12 border rounded ${isFilling ? 'bg-activeBg text-white' : 'bg-secondary text-primary'} mb-2 transition-transform duration-200 hover:-translate-y-1`}
             >
               Fill
@@ -485,15 +501,15 @@ const CreateArt = () => {
             </button>
 
             <button
-              onClick={() => setIsPicking(!isPicking)}
+              onClick={() => toggleTool('pick')}
               className={`w-24 h-12 border rounded ${isPicking ? 'bg-activeBg text-white' : 'bg-secondary text-primary transition-transform duration-200 hover:-translate-y-1'} mb-2`}
             >
               Pipette
             </button>
 
             <button
-              onClick={() => setIsErasing(!isErasing)}
-              className={`w-24 h-12 border rounded ${isErasing ? 'bg-red-500 text-white' : 'bg-secondary text-primary transition-transform duration-200 hover:-translate-y-1'} mb-2`}
+              onClick={() => toggleTool('erase')}
+              className={`w-24 h-12 border rounded ${isErasing ? 'bg-activeBg text-white' : 'bg-secondary text-primary transition-transform duration-200 hover:-translate-y-1'} mb-2`}
             >
               Eraser
             </button>
