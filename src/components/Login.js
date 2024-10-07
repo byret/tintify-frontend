@@ -29,7 +29,6 @@ const handleLogin = async (e) => {
       sessionStorage.setItem('username', username);
       sessionStorage.setItem('authToken', response.data.token);
 
-      // Перенаправление на указанный URL
       if (redirectUrl) {
         window.location.href = redirectUrl;
       } else {

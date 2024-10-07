@@ -68,7 +68,6 @@ const Home = () => {
       .catch(error => console.error('Error fetching users who liked the item:', error));
   };
 
-  // Закрытие окна Create при клике вне него
   useEffect(() => {
     const handleClickOutsideCreate = (event) => {
       if (isModalOpen && createModalRef.current && !createModalRef.current.contains(event.target)) {
@@ -81,7 +80,6 @@ const Home = () => {
     };
   }, [isModalOpen]);
 
-  // Закрытие окна палитры при клике вне
   useEffect(() => {
     const handleClickOutsidePalette = (event) => {
       if (paletteModalOpen && paletteModalRef.current && !paletteModalRef.current.contains(event.target) && !likesModalOpen) {
@@ -94,7 +92,6 @@ const Home = () => {
     };
   }, [paletteModalOpen, likesModalOpen]);
 
-  // Закрытие окна артов при клике вне
   useEffect(() => {
     const handleClickOutsideArt = (event) => {
       if (artModalOpen && artModalRef.current && !artModalRef.current.contains(event.target)) {
@@ -107,7 +104,6 @@ const Home = () => {
     };
   }, [artModalOpen]);
 
-  // Закрытие окна лайков при клике вне
   useEffect(() => {
     const handleClickOutsideLikes = (event) => {
       if (likesModalOpen && likesModalRef.current && !likesModalRef.current.contains(event.target)) {
@@ -181,7 +177,7 @@ const Home = () => {
   const artWidth = publicPalettes.length > 0 ? publicPalettes[0].colors.length * 32 * 2 : 0; // Установка ширины артов (умножаем на 2 для увеличения)
 
   const handleDownloadArtAsPng = (art) => {
-    const pixelSize = selectedArt.pixelSize;
+    const pixelSize = selectedArt.pixelSize * 5;
 
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');

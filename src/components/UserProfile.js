@@ -44,7 +44,6 @@ const UserProfile = () => {
       .catch(error => console.error('Error fetching public arts:', error));
   }, [username, API_BASE_URL]);
 
-  // Проверка, лайкнута ли палитра текущим пользователем
   const isPaletteLiked = (paletteId) => {
     return likedPalettes.some(palette => palette.id === paletteId);
   };

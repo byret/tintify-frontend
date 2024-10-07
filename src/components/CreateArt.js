@@ -76,17 +76,18 @@ const CreateArt = () => {
   }, []);
 
    const handleDownloadImage = () => {
+      const imagePixelSize = pixelSize * 5;
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
 
-      canvas.width = width * pixelSize;
-      canvas.height = height * pixelSize;
+      canvas.width = width * imagePixelSize;
+      canvas.height = height * imagePixelSize;
 
       pixels.forEach((color, index) => {
         const row = Math.floor(index / width);
         const col = index % width;
         context.fillStyle = color;
-        context.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+        context.fillRect(col * imagePixelSize, row * imagePixelSize, imagePixelSize, imagePixelSize);
       });
 
       const link = document.createElement('a');
@@ -197,7 +198,6 @@ const CreateArt = () => {
     const newWidth = Math.max(2, Math.min(32, Number(e.target.value)));
     const newPixels = Array(newWidth * height).fill('#ffffff');
 
-    // Копируем старые цвета в новую структуру, если это возможно
     for (let i = 0; i < height; i++) {
       for (let j = 0; j < newWidth; j++) {
         const oldIndex = i * width + j;
@@ -362,7 +362,6 @@ const CreateArt = () => {
         <Navbar showSaveButton={true} onSaveClick={handleSaveClick} />
 
         <div className="container mx-auto py-8 flex justify-center items-start space-x-16">
-          {/* Палитра слева */}
           <div className="flex flex-col items-center" style={{ marginRight: '50px' }}>
             <h2 className="text-secondary text-xl mb-4">Palette</h2>
             <div className="flex mb-8 space-x-2">
@@ -376,7 +375,7 @@ const CreateArt = () => {
                   key={index}
                   className={`w-[46px] h-[46px] cursor-pointer border ${activePaletteIndex === index ? 'border-4 border-yellow-500' : ''}`}
                   style={{ backgroundColor: color }}
-                  onClick={(e) => handleSquareClick(index, e, true)} // Передаем событие в функцию
+                  onClick={(e) => handleSquareClick(index, e, true)}
                 />
               ))}
             </div>
