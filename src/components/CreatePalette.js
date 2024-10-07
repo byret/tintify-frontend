@@ -206,7 +206,7 @@ const CreatePalette = () => {
             <div className="flex justify-center space-x-4">
               <button
                 onClick={handleSavePalette}
-                className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary"
+                className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary hover:text-primary"
               >
                 Save palette
               </button>
