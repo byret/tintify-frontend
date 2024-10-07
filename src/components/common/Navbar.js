@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 const Navbar = ({
@@ -14,6 +14,7 @@ const Navbar = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -22,6 +23,9 @@ const Navbar = ({
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  // Проверка, нужно ли отображать гамбургер-меню (скрываем его на страницах логина и регистрации)
+  const hideHamburger = location.pathname === '/login' || location.pathname === '/register';
 
   return (
     <nav className="bg-[#a38c9a] p-2 shadow-lg fixed w-full top-0 z-10">
@@ -35,24 +39,27 @@ const Navbar = ({
           </Link>
         </div>
 
-        <div className="md:hidden">
-          <button onClick={toggleMobileMenu} className="text-white">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              ></path>
-            </svg>
-          </button>
-        </div>
+        {/* Показываем гамбургер-меню только на нужных страницах */}
+        {!hideHamburger && (
+          <div className="md:hidden">
+            <button onClick={toggleMobileMenu} className="text-white">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        )}
 
         <div className={`md:flex items-center space-x-2 md:space-x-4 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
           {showSaveButton && (
@@ -102,7 +109,7 @@ const Navbar = ({
               </button>
             </>
           ) : !isAuthenticated && onHomePage ? (
-            <div className="flex flex-wrap items-center space-x-2 md:space-x-4">
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
               <button
                 onClick={() => navigate('/login')}
                 className="bg-primary text-secondary py-1 px-3 md:py-2 md:px-4 rounded text-sm md:text-base transition-transform duration-200 hover:-translate-y-1"
