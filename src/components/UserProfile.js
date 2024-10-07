@@ -259,7 +259,7 @@ const UserProfile = () => {
                       <div key={index} className="flex items-center space-x-2">
                         {user.avatarPath && (
                           <img
-                            src={avatar ? avatar : "/default_avatar.png"}
+                            src={`${API_BASE_URL}${user.avatarPath}`}
                             alt="User Avatar"
                             className="rounded-full h-32 w-32 object-cover mx-auto mb-4"
                           />
