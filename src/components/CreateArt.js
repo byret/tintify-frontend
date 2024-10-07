@@ -134,8 +134,6 @@ const CreateArt = () => {
           setCurrentColor(palette[index]);
         }
 
-        setPickerVisible(true);
-
         const rect = event.target.getBoundingClientRect();
         setPosition({
           top: rect.top + window.scrollY + rect.height,
@@ -143,7 +141,6 @@ const CreateArt = () => {
         });
       } else {
         setSelectedPixel(index + palette.length);
-        setPickerVisible(true);
         const rect = event.target.getBoundingClientRect();
         setPosition({
           top: rect.top + window.scrollY + rect.height,
@@ -344,6 +341,10 @@ const CreateArt = () => {
     setPixels(newPixels);
   };
 
+  const handleClearPalette = () => {
+    setPalette(Array(palette.length).fill('#ffffff'));
+  };
+
   const getNeighbors = (index) => {
     const neighbors = [];
     const row = Math.floor(index / width);
@@ -376,6 +377,9 @@ const CreateArt = () => {
                   className={`w-[46px] h-[46px] cursor-pointer border ${activePaletteIndex === index ? 'border-4 border-yellow-500' : ''}`}
                   style={{ backgroundColor: color }}
                   onClick={(e) => handleSquareClick(index, e, true)}
+                  onDoubleClick={(e) => {
+                    setPickerVisible(true);
+                  }}
                 />
               ))}
             </div>
@@ -421,6 +425,9 @@ const CreateArt = () => {
                         handleSquareClick(index, e, false);
                       }
                     }}
+                    onDoubleClick={(e) => {
+                      setPickerVisible(true);
+                    }}
                   />
                 ))}
               </div>
@@ -435,7 +442,7 @@ const CreateArt = () => {
 
             <button
               onClick={() => setIsFilling(!isFilling)}
-              className={`w-24 h-12 border rounded ${isFilling ? 'bg-green-500 text-white' : 'bg-secondary text-primary'} mb-2`}
+              className={`w-24 h-12 border rounded ${isFilling ? 'bg-activeBg text-white' : 'bg-secondary text-primary'} mb-2`}
             >
               Fill
             </button>
@@ -458,9 +465,16 @@ const CreateArt = () => {
 
             <button
               onClick={() => setIsPicking(!isPicking)}
-              className={`w-24 h-12 border rounded ${isPicking ? 'bg-blue-500 text-white' : 'bg-secondary text-primary'} mb-2`}
+              className={`w-24 h-12 border rounded ${isPicking ? 'bg-activeBg text-white' : 'bg-secondary text-primary'} mb-2`}
             >
               Pipette
+            </button>
+
+            <button
+              onClick={handleClearPalette}
+              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2"
+            >
+              Clear
             </button>
           </div>
         </div>

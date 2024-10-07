@@ -20,6 +20,7 @@ const CreatePalette = () => {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
   const pickerRef = useRef(null);
+  const saveModalRef = useRef(null); // Ref для модального окна
 
   const isAuthenticated = sessionStorage.getItem('authToken') ? true : false;
 
@@ -32,8 +33,13 @@ const CreatePalette = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Закрытие цветового пикера при клике вне его
       if (pickerRef.current && !pickerRef.current.contains(event.target)) {
         setPickerVisible(false);
+      }
+      // Закрытие модального окна при клике вне его
+      if (isSaveModalOpen && saveModalRef.current && !saveModalRef.current.contains(event.target)) {
+        setIsSaveModalOpen(false);
       }
     };
 
@@ -41,7 +47,7 @@ const CreatePalette = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isSaveModalOpen]);
 
   const handleColorChange = (color) => {
     const newColors = [...colors];
@@ -170,7 +176,7 @@ const CreatePalette = () => {
 
       {isSaveModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+          <div ref={saveModalRef} className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <h2 className="text-2xl text-secondary font-bold mb-4">Save palette</h2>
 
             <div className="mb-4">
@@ -197,13 +203,7 @@ const CreatePalette = () => {
               </label>
             </div>
 
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-400 text-secondary rounded hover:bg-gray-500"
-              >
-                Cancel
-              </button>
+            <div className="flex justify-center space-x-4">
               <button
                 onClick={handleSavePalette}
                 className="px-4 py-2 bg-primary text-secondary rounded hover:bg-secondary"
