@@ -26,12 +26,12 @@ const Navbar = ({
   return (
     <nav className="bg-[#a38c9a] p-2 shadow-lg fixed w-full top-0 z-10">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 md:space-x-4">
           <Link to="/">
-            <img src="/logo.png" alt="Logo" className="h-10 md:h-16" />
+            <img src="/logo.png" alt="Logo" className="h-8 md:h-12" />
           </Link>
           <Link to="/">
-            <span className="text-white text-xl md:text-2xl font-semibold font-sans">Tintify</span>
+            <span className="text-white text-lg md:text-2xl font-semibold">Tintify</span>
           </Link>
         </div>
 
@@ -54,11 +54,11 @@ const Navbar = ({
           </button>
         </div>
 
-        <div className={`md:flex items-center space-x-4 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+        <div className={`md:flex items-center space-x-2 md:space-x-4 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
           {showSaveButton && (
             <button
               onClick={onSaveClick}
-              className="bg-primary text-secondary py-2 px-4 rounded transition-transform duration-200 hover:-translate-y-1"
+              className="bg-primary text-secondary py-1 px-3 md:py-2 md:px-4 rounded text-sm md:text-base transition-transform duration-200 hover:-translate-y-1"
             >
               Save
             </button>
@@ -67,26 +67,26 @@ const Navbar = ({
           {isAuthenticated && onHomePage ? (
             <>
               <div onClick={toggleDropdown} className="relative">
-                <span className="text-white cursor-pointer">
+                <span className="text-white cursor-pointer text-sm md:text-base">
                   Welcome, {username}!
                 </span>
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md z-20">
+                  <div className="absolute right-0 mt-2 w-40 md:w-48 bg-white shadow-md rounded-md z-20">
                     <Link
                       to={`/users/${username}`}
-                      className="block px-4 py-2 text-secondary hover:bg-gray-200"
+                      className="block px-4 py-2 text-secondary text-sm md:text-base hover:bg-gray-200"
                     >
                       My Profile
                     </Link>
                     <Link
                       to="/account-settings"
-                      className="block px-4 py-2 text-secondary hover:bg-gray-200"
+                      className="block px-4 py-2 text-secondary text-sm md:text-base hover:bg-gray-200"
                     >
                       Account Settings
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-secondary hover:bg-gray-200"
+                      className="block w-full text-left px-4 py-2 text-secondary text-sm md:text-base hover:bg-gray-200"
                     >
                       Log Out
                     </button>
@@ -96,30 +96,30 @@ const Navbar = ({
 
               <button
                 onClick={openModal}
-                className="bg-primary text-secondary py-2 px-4 rounded transition-transform duration-200 hover:-translate-y-1"
+                className="bg-primary text-secondary py-1 px-3 md:py-2 md:px-4 rounded text-sm md:text-base transition-transform duration-200 hover:-translate-y-1"
               >
                 Create
               </button>
             </>
           ) : !isAuthenticated && onHomePage ? (
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center space-x-2 md:space-x-4">
               <button
                 onClick={() => navigate('/login')}
-                className="bg-primary text-secondary py-2 px-4 rounded transition-transform duration-200 hover:-translate-y-1"
+                className="bg-primary text-secondary py-1 px-3 md:py-2 md:px-4 rounded text-sm md:text-base transition-transform duration-200 hover:-translate-y-1"
               >
                 Login
               </button>
 
               <button
                 onClick={() => navigate('/register')}
-                className="bg-primary text-secondary py-2 px-4 rounded transition-transform duration-200 hover:-translate-y-1"
+                className="bg-primary text-secondary py-1 px-3 md:py-2 md:px-4 rounded text-sm md:text-base transition-transform duration-200 hover:-translate-y-1"
               >
                 Register
               </button>
 
               <button
                 onClick={openModal}
-                className="bg-primary text-secondary py-2 px-4 rounded transition-transform duration-200 hover:-translate-y-1"
+                className="bg-primary text-secondary py-1 px-3 md:py-2 md:px-4 rounded text-sm md:text-base transition-transform duration-200 hover:-translate-y-1"
               >
                 Create
               </button>
