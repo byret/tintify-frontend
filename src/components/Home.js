@@ -303,8 +303,8 @@ const Home = () => {
                           style={{
                             gridTemplateColumns: `repeat(${art.width}, 1fr)`,
                             gap: '0px',
-                            width: `${artWidth}px`,
-                            height: `${art.height * (artWidth / art.width)}px`,
+                            width: `410px`,
+                            height: `${art.height * (410 / art.width)}px`,
                           }}
                         >
                           {art.pixels.map((color, idx) => (
