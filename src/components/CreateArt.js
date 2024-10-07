@@ -7,7 +7,7 @@ const CreateArt = () => {
   const [width, setWidth] = useState(10);
   const [height, setHeight] = useState(10);
   const [pixelSize, setPixelSize] = useState(45);
-  const [pixels, setPixels] = useState(Array(width * height).fill('#ffffff'));
+  const [pixels, setPixels] = useState(Array(width * height).fill('rgba(0, 0, 0, 0)'));
 
   const [palette, setPalette] = useState(Array(3 * 3).fill('#ffffff'));
   const [paletteWidth] = useState(3);
@@ -23,6 +23,7 @@ const CreateArt = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [isFilling, setIsFilling] = useState(false);
   const [isPicking, setIsPicking] = useState(false);
+  const [isErasing, setIsErasing] = useState(false);
 
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
@@ -119,7 +120,9 @@ const CreateArt = () => {
   };
 
   const handleSquareClick = (index, event, isPalette) => {
-    if (isPicking) {
+    if (isErasing) {
+      handleErase(index);
+    } else if (isPicking) {
       setCurrentColor(pixels[index]);
       setIsPicking(false);
     } else {
@@ -153,18 +156,29 @@ const CreateArt = () => {
   const handleMouseDown = (index, isPalette) => {
     saveStateForUndo();
 
-    if (!isPalette && !isFilling && !isPicking) {
-      const newPixels = [...pixels];
-      newPixels[index] = currentColor;
-      setPixels(newPixels);
-      setIsDrawing(true);
+    if (!isPalette) {
+      if (isErasing) {
+        const newPixels = [...pixels];
+        newPixels[index] = 'rgba(0, 0, 0, 0)';
+        setPixels(newPixels);
+        setIsDrawing(true);
+      } else if (!isFilling && !isPicking) {
+        const newPixels = [...pixels];
+        newPixels[index] = currentColor;
+        setPixels(newPixels);
+        setIsDrawing(true);
+      }
     }
   };
 
   const handleMouseMove = (index) => {
     if (isDrawing) {
       const newPixels = [...pixels];
-      newPixels[index] = currentColor;
+      if (isErasing) {
+        newPixels[index] = 'rgba(0, 0, 0, 0)';
+      } else {
+        newPixels[index] = currentColor;
+      }
       setPixels(newPixels);
     }
   };
@@ -193,7 +207,7 @@ const CreateArt = () => {
 
   const handleWidthChange = (e) => {
     const newWidth = Math.max(2, Math.min(32, Number(e.target.value)));
-    const newPixels = Array(newWidth * height).fill('#ffffff');
+    const newPixels = Array(newWidth * height).fill('rgba(0, 0, 0, 0)');
 
     for (let i = 0; i < height; i++) {
       for (let j = 0; j < newWidth; j++) {
@@ -210,7 +224,7 @@ const CreateArt = () => {
 
   const handleHeightChange = (e) => {
     const newHeight = Math.max(2, Math.min(32, Number(e.target.value)));
-    const newPixels = Array(width * newHeight).fill('#ffffff');
+    const newPixels = Array(width * newHeight).fill('rgba(0, 0, 0, 0)');
 
     for (let i = 0; i < newHeight; i++) {
       for (let j = 0; j < width; j++) {
@@ -341,9 +355,15 @@ const CreateArt = () => {
     setPixels(newPixels);
   };
 
-  const handleClearPalette = () => {
-    setPalette(Array(palette.length).fill('#ffffff'));
+  const handleClearArt = () => {
+    setPixels(Array(pixels.length).fill('rgba(0, 0, 0, 0)'));
   };
+
+  const handleErase = (index) => {
+      const newPixels = [...pixels];
+      newPixels[index] = 'rgba(0, 0, 0, 0)';
+      setPixels(newPixels);
+   };
 
   const getNeighbors = (index) => {
     const neighbors = [];
@@ -366,9 +386,9 @@ const CreateArt = () => {
           <div className="flex flex-col items-center" style={{ marginRight: '50px' }}>
             <h2 className="text-secondary text-xl mb-4">Palette</h2>
             <div className="flex mb-8 space-x-2">
-              <button onClick={addPaletteSquare} className="bg-secondary text-primary w-10 h-10 border rounded">+</button>
-              <button onClick={removePaletteSquare} className="bg-secondary text-primary w-10 h-10 border rounded">-</button>
-              <button onClick={openModal} className="bg-secondary text-primary w-10 h-10 border rounded">...</button>
+              <button onClick={addPaletteSquare} className="bg-secondary text-primary w-10 h-10 border rounded transition-transform duration-200 hover:-translate-y-1">+</button>
+              <button onClick={removePaletteSquare} className="bg-secondary text-primary w-10 h-10 border rounded transition-transform duration-200 hover:-translate-y-1">-</button>
+              <button onClick={openModal} className="bg-secondary text-primary w-10 h-10 border rounded transition-transform duration-200 hover:-translate-y-1">...</button>
             </div>
             <div className="grid" style={{ gridTemplateColumns: `repeat(${paletteWidth}, 1fr)` }}>
               {palette.map((color, index) => (
@@ -386,7 +406,6 @@ const CreateArt = () => {
           </div>
 
           <div className="flex flex-col items-center">
-            <h2 className="text-secondary text-xl mb-4">Pixel Art</h2>
             <div className="flex justify-center mb-8 space-x-4">
               <div>
                 <label className="text-secondary mr-2">Width:</label>
@@ -411,10 +430,14 @@ const CreateArt = () => {
                     key={index}
                     className="cursor-pointer border"
                     style={{
-                      backgroundColor: color,
-                      width: `${pixelSize}px`,
-                      height: `${pixelSize}px`,
-                    }}
+                        backgroundColor: color === 'rgba(0, 0, 0, 0)' ? 'transparent' : color,
+                        backgroundImage: color === 'rgba(0, 0, 0, 0)' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc)' : 'none',
+                        backgroundSize: '10px 10px',
+                        backgroundPosition: '0 0, 5px 5px',
+                        width: `${pixelSize}px`,
+                        height: `${pixelSize}px`,
+                        boxSizing: 'border-box',
+                      }}
                     onMouseDown={() => handleMouseDown(index, false)}
                     onMouseMove={() => handleMouseMove(index)}
                     onClick={(e) => {
@@ -442,37 +465,42 @@ const CreateArt = () => {
 
             <button
               onClick={() => setIsFilling(!isFilling)}
-              className={`w-24 h-12 border rounded ${isFilling ? 'bg-activeBg text-white' : 'bg-secondary text-primary'} mb-2`}
+              className={`w-24 h-12 border rounded ${isFilling ? 'bg-activeBg text-white' : 'bg-secondary text-primary'} mb-2 transition-transform duration-200 hover:-translate-y-1`}
             >
               Fill
             </button>
 
             <button
               onClick={handleUndo}
-              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2"
-              disabled={undoStack.length === 0}
+              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2 transition-transform duration-200 hover:-translate-y-1"
             >
               Undo
             </button>
 
             <button
               onClick={handleRedo}
-              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2"
-              disabled={redoStack.length === 0}
+              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2 transition-transform duration-200 hover:-translate-y-1"
             >
               Redo
             </button>
 
             <button
               onClick={() => setIsPicking(!isPicking)}
-              className={`w-24 h-12 border rounded ${isPicking ? 'bg-activeBg text-white' : 'bg-secondary text-primary'} mb-2`}
+              className={`w-24 h-12 border rounded ${isPicking ? 'bg-activeBg text-white' : 'bg-secondary text-primary transition-transform duration-200 hover:-translate-y-1'} mb-2`}
             >
               Pipette
             </button>
 
             <button
-              onClick={handleClearPalette}
-              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2"
+              onClick={() => setIsErasing(!isErasing)}
+              className={`w-24 h-12 border rounded ${isErasing ? 'bg-red-500 text-white' : 'bg-secondary text-primary transition-transform duration-200 hover:-translate-y-1'} mb-2`}
+            >
+              Eraser
+            </button>
+
+            <button
+              onClick={handleClearArt}
+              className="w-24 h-12 bg-secondary text-primary rounded hover:bg-secondaryDarker mb-2 transition-transform duration-200 hover:-translate-y-1"
             >
               Clear
             </button>
