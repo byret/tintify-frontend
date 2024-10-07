@@ -428,12 +428,6 @@ const Home = () => {
             <h2 className="text-2xl text-secondary font-bold mb-4">
               Users who liked this palette
             </h2>
-            <button
-              onClick={() => setLikesModalOpen(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-black"
-            >
-              Close
-            </button>
             <div className="grid grid-cols-3 gap-4">
               {likesUsers.length > 0 ? (
                 likesUsers.map((user, index) => (
