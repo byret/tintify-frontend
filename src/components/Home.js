@@ -275,9 +275,17 @@ const Home = () => {
                           style={{ width: 'fit-content', cursor: 'pointer' }}
                           onClick={() => handleOpenPaletteModal(palette)}
                         >
-                          <div className="grid grid-cols-4 gap-0 mb-4" style={{ width: 'fit-content' }}>
+                          <div className="flex justify-start flex-wrap gap-0 mb-4 overflow-x-auto max-w-full">
                             {palette.colors.map((color, idx) => (
-                              <div key={idx} className="w-32 h-32" style={{ backgroundColor: color }} />
+                              <div
+                                key={idx}
+                                className="h-32"
+                                style={{
+                                  backgroundColor: color,
+                                  width: `${Math.min(128, Math.max(32, 512 / palette.colors.length))}px`, // адаптивная ширина
+                                  flexShrink: 0,
+                                }}
+                              />
                             ))}
                           </div>
                         </div>

@@ -12,7 +12,6 @@ function App() {
   return (
     <Router>
       <div>
-        <h1>PixApp</h1>
         <Routes>
           <Route path="/" element={<Navigate to="/home" />} />
           <Route path="/register" element={<Register />} />

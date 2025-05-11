@@ -265,20 +265,26 @@ const CreateArt = () => {
   const openModal = () => {
     const username = sessionStorage.getItem('username');
 
-    axios
-      .get(`${API_BASE_URL}/palettes/user/${username}`, { withCredentials: true })
-      .then((response) => {
-        setUserPalettes(response.data);
-        setIsModalOpen(true);
-      })
-      .catch((error) => console.error('Error fetching user palettes:', error));
+    if (isAuthenticated && username) {
+      setActiveTab('my-palettes');
+      axios
+        .get(`${API_BASE_URL}/palettes/user/${username}`, { withCredentials: true })
+        .then((response) => {
+          setUserPalettes(response.data);
+          setIsModalOpen(true);
+        })
+        .catch((error) => console.error('Error fetching user palettes:', error));
 
-    axios
-      .get(`${API_BASE_URL}/palettes/user/${username}/likes`, { withCredentials: true })
-      .then((response) => {
-        setLikedPalettes(response.data);
-      })
-      .catch((error) => console.error('Error fetching liked palettes:', error));
+      axios
+        .get(`${API_BASE_URL}/palettes/user/${username}/likes`, { withCredentials: true })
+        .then((response) => {
+          setLikedPalettes(response.data);
+        })
+        .catch((error) => console.error('Error fetching liked palettes:', error));
+    } else {
+      setActiveTab('all-palettes');
+      setIsModalOpen(true);
+    }
 
     axios
       .get(`${API_BASE_URL}/palettes/public`, { withCredentials: true })
@@ -552,18 +558,22 @@ const CreateArt = () => {
             </div>
 
             <div className="flex justify-center space-x-4 mb-4">
-              <button
-                onClick={() => setActiveTab('my-palettes')}
-                className={`px-4 py-2 ${activeTab === 'my-palettes' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg text-secondaryDarker'}`}
-              >
-                My Palettes
-              </button>
-              <button
-                onClick={() => setActiveTab('liked-palettes')}
-                className={`px-4 py-2 ${activeTab === 'liked-palettes' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg text-secondaryDarker'}`}
-              >
-                Liked Palettes
-              </button>
+               {isAuthenticated && (
+                  <>
+                    <button
+                      onClick={() => setActiveTab('my-palettes')}
+                      className={`px-4 py-2 ${activeTab === 'my-palettes' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg text-secondaryDarker'}`}
+                    >
+                      My Palettes
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('liked-palettes')}
+                      className={`px-4 py-2 ${activeTab === 'liked-palettes' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg text-secondaryDarker'}`}
+                    >
+                      Liked Palettes
+                    </button>
+                  </>
+                )}
               <button
                 onClick={() => setActiveTab('all-palettes')}
                 className={`px-4 py-2 ${activeTab === 'all-palettes' ? 'bg-activeBg text-areasBg' : 'bg-inactiveBg text-secondaryDarker'}`}

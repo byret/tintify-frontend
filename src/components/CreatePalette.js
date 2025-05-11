@@ -33,11 +33,9 @@ const CreatePalette = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Закрытие цветового пикера при клике вне его
       if (pickerRef.current && !pickerRef.current.contains(event.target)) {
         setPickerVisible(false);
       }
-      // Закрытие модального окна при клике вне его
       if (isSaveModalOpen && saveModalRef.current && !saveModalRef.current.contains(event.target)) {
         setIsSaveModalOpen(false);
       }
