@@ -275,14 +275,14 @@ const Home = () => {
                           style={{ width: 'fit-content', cursor: 'pointer' }}
                           onClick={() => handleOpenPaletteModal(palette)}
                         >
-                          <div className="flex justify-start flex-wrap gap-0 mb-4 overflow-x-auto max-w-full">
+                          <div className="flex gap-0 mb-4" style={{ width: '512px' }}>
                             {palette.colors.map((color, idx) => (
                               <div
                                 key={idx}
-                                className="h-32"
                                 style={{
                                   backgroundColor: color,
-                                  width: `${Math.min(128, Math.max(32, 512 / palette.colors.length))}px`, // адаптивная ширина
+                                  width: `${512 / palette.colors.length}px`,
+                                  height: '128px',
                                   flexShrink: 0,
                                 }}
                               />
